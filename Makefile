@@ -48,7 +48,10 @@ shared/shared.cma:             \
 	shared/definitions.cmo \
 	shared/connection.cmo  \
 	shared/constants.cmo   \
-	shared/util.cmo
+	shared/util.cmo \
+	shared/mTeams.cmo \
+	shared/mUfos.cmo \
+	shared/mWeapons.cmo
 
 team/babybot.exe:         \
 	shared/shared.cma \
