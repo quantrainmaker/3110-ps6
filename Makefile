@@ -51,7 +51,8 @@ shared/shared.cma:             \
 	shared/util.cmo \
 	shared/mTeams.cmo \
 	shared/mUfos.cmo \
-	shared/mWeapons.cmo
+	shared/mWeapons.cmo \
+	shared/mCollisions.cmo
 
 team/babybot.exe:         \
 	shared/shared.cma \

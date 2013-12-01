@@ -19,8 +19,9 @@ module type UFO = sig
   (* Updates the Ufo's position *)
   val move_ufo : ufo -> ufo
   (* Updates positions (and velocities when necessary) of Ufos
-   * The int tracks the time the Ufo was created *)
-  val batch_ufo : (ufo*int) list -> (ufo*int) list
+   * The tuple int tracks the time the Ufo was created 
+   * The second int is the current time *)
+  val batch_ufo : (ufo*int) list -> int -> (ufo*int) list
 end
 
 (* UFO functions *)
@@ -50,9 +51,9 @@ module UFO_Mechanics : UFO = struct
   let move_ufo x = 
     let new_pos = add_v x.u_pos x.u_vel in
     {x with u_pos = new_pos}
-  let batch_ufo l =
+  let batch_ufo l i =
     List.fold_left (fun acc x -> 
-      if (snd x) mod cUFO_MOVE_INTERVAL = 0 && (snd x) > cUFO_MOVE_INTERVAL then
+      if (i - (snd x)) mod cUFO_MOVE_INTERVAL = 0 && (snd x) < i then
         let j = move_ufo (redirect (fst x)) in
         (j,(snd x)+1)::acc
       else

@@ -19,10 +19,10 @@ end
 (* Player functions *)
 module Player_Mechanics = struct
   let is_impassable x = 
-    let x_val = int_of_float (fst x) in 
-    let y_val = int_of_float (snd x) in
-    x_val >= 0 && x_val <= cBOARD_WIDTH && 
-    y_val >= 0 && y_val <= cBOARD_HEIGHT
+    let x_val = fst x in 
+    let y_val = snd x in
+    x_val >= 0.0 && x_val <= float_of_int (cBOARD_WIDTH) && 
+    y_val >= 0.0 && y_val <= float_of_int (cBOARD_HEIGHT)
   let red_char = 
     let pos = (0.125 *. float_of_int (cBOARD_WIDTH), 
       0.50 *. float_of_int (cBOARD_HEIGHT)) in   
@@ -69,6 +69,22 @@ module type Team_Data = sig
   val disarm_bomber : team_data -> team_data
   (* Determines if game has ended *)
   val check_endgame : team_data -> team_data -> result
+  (* Apply a single move to the team character from the move list *)
+  val recruit_rambo : team_data -> 
+    (direction * direction) list -> team_data
+  (* Remove the first move from a move list if possible *)
+  val alter_orders : (direction * direction) list -> 
+    (direction * direction) list 
+  (* Return player character *)
+  val find_rambo : team_data -> player_char
+  (* Add kill points to team *)
+  val award_medal : team_data -> team_data
+  (* Resets team data after suffering a bullet hit *)
+  val reset_bullet_hit : team_data -> team_data
+  (* Takes two ints - determines if invincible or not *)
+  val protection : int -> int -> bool
+  (* Adds power to the team *)
+  val arm_rambo : team_data -> int -> team_data
 end
 
 (* Team functions *)
@@ -104,4 +120,23 @@ module Team_Mechanics : Team_Data = struct
         else if death_check x then Winner l.p_color
         else if death_check y then Winner f.p_color
         else Unfinished
+  let recruit_rambo t d = match t with
+  | (l,q,s,p,c,pl) -> 
+    begin match d with
+    | [] -> (l,q,s,p,c,pl)
+    | head::tail ->
+      let npl = Player_Mechanics.keep_moving pl head in
+      (l,q,s,p,c,npl) end
+  let alter_orders d = match d with
+  | [] -> []
+  | head::tail -> tail
+  let find_rambo x = match x with
+  | (l,q,s,p,c,pl) -> pl
+  let award_medal x = match x with
+  | (l,q,s,p,c,pl) -> (l,q,(s + cKILL_POINTS),p,c,pl)
+  let reset_bullet_hit x = match x with
+  | (l,q,s,p,c,pl) -> ((l-1),cINITIAL_BOMBS,s,(p/2),c,pl)
+  let protection x y = x > 0 || y > 0
+  let arm_rambo x y = match x with
+  | (l,q,s,p,c,pl) -> (l,q,s,(p+y),c,pl)
 end

@@ -22,6 +22,8 @@ module type Weapons = sig
   val metal_move : bullet -> bullet option
   (* Update list of bullets, removing those that are off the field *)
   val batch_bullets : bullet list -> bullet list
+  (* Move the powerups's positions by their velocities *)
+  val batch_powerups : power list -> power list
 end
 
 module Weapon_Mechanics : Weapons = struct
@@ -89,10 +91,10 @@ module Weapon_Mechanics : Weapons = struct
     | Power -> [] (* Unavailable bullet type *) end
   | _ -> failwith "Invalid weapons command. Report to your superior!"
   let is_impassable x = 
-    let x_val = int_of_float (fst x) in 
-    let y_val = int_of_float (snd x) in
-    x_val >= 0 && x_val <= cBOARD_WIDTH && 
-    y_val >= 0 && y_val <= cBOARD_HEIGHT
+    let x_val = fst x in 
+    let y_val = snd x in
+    x_val >= 0.0 && x_val <= float_of_int (cBOARD_WIDTH) && 
+    y_val >= 0.0 && y_val <= float_of_int (cBOARD_HEIGHT)
   let metal_move x = 
     let new_pos = add_v x.b_pos x.b_vel in
     let new_vel = add_v x.b_vel x.b_accel in
@@ -106,4 +108,8 @@ module Weapon_Mechanics : Weapons = struct
       match metal_move x with
       | Some y -> y::a
       | None -> a) [] b
+  let batch_powerups x = 
+    List.fold_left (fun acc y -> 
+      let j = {y with b_vel = (add_v y.b_vel y.b_pos)} in
+      j::acc) [] x
 end
