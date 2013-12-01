@@ -7,7 +7,8 @@ open MWeapons
 
 (* Record for holding game information.
  * Includes Red/blue teams, Ufos, Bullets, Powerups, Time Elapsed,
- * Pending Red Moves and Pending blue Moves. *)
+ * Pending Red Moves and Pending blue Moves. Store Ufos as tuple
+ * to include creation time to track when to change direction *)
 type game = {mutable redx : team_data; mutable bluex : team_data; 
   mutable ufox : (ufo*int) list; mutable bl : bullet list; 
   mutable pl : power list; mutable time_el : int; 
@@ -24,11 +25,13 @@ let init_game () : game =
     red_invincibility = 0; blue_invincibility = 0}
   
 (* Updates the game state by a single time step *)
-let handle_time game =
+let handle_time game = 
   (* Continually edit parse_game for the current time_step *)
-  (* let parse_game = game in *)
-  (* Update UFO positions and velocities (if needed) *)
-
+  let parse_game = game in
+  (* Update current ufo positions and velocities (if needed) *)
+  parse_game.ufox <- UFO_Mechanics.batch_ufo parse_game.ufox;
+  (* Update current bullet positions and velocities *)
+  parse_game.bl <- Weapon_Mechanics.batch_bullets parse_game.bl
   (* Toggle player focus *)
 
   (* Update player positions *)
@@ -37,10 +40,10 @@ let handle_time game =
 
   (* Check for UFO and bullet collisions *)
 
-  (* Check for endgame conditions *)
-  (* if Team_Mechanics.death_check game.redx && 
-    Team_Mechanics.death_check game.bluex then *)
-  failwith "todo"
+  (* Check for endgame conditions - Return game * result *)
+  let game_status = 
+    Team_Mechanics.check_endgame parse_game.redx parse_game.bluex in
+  (parse_game,game_status)
 
 (* Handles commands from the AIs - immediately update game state *)
 let handle_action gamma col act = match act with

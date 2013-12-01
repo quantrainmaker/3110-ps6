@@ -9,7 +9,7 @@ module type UFO = sig
   (* Create random velocity vector base on curr. pos. with UFO speed *)
   val alien_path : vector -> vector
   (* Default UFO *)
-  val base_ufo : int -> ufo
+  val base_ufo : unit -> ufo
   (* Change UFO direction to random point on screen *)
   val redirect : ufo -> ufo
   (* UFO takes a hit *)
@@ -18,6 +18,9 @@ module type UFO = sig
   val destroyed : ufo -> bool
   (* Updates the Ufo's position *)
   val move_ufo : ufo -> ufo
+  (* Updates positions (and velocities when necessary) of Ufos
+   * The int tracks the time the Ufo was created *)
+  val batch_ufo : (ufo*int) list -> (ufo*int) list
 end
 
 (* UFO functions *)
@@ -34,7 +37,7 @@ module UFO_Mechanics : UFO = struct
     let rey = float_of_int (Random.int 2) in
     let pos = (rex *. float_of_int (cBOARD_WIDTH), 
     	rey *. float_of_int (cBOARD_HEIGHT)) in 
-    {u_id = x; u_pos = pos; u_vel = (alien_path pos); 
+    {u_id = (next_available_id ()); u_pos = pos; u_vel = (alien_path pos); 
       u_radius = cUFO_RADIUS; u_red_hits = 0; u_blue_hits = 0}
   let redirect x = {x with u_vel = (alien_path x.u_pos)}
   let suffer_hit x col = 
@@ -47,4 +50,12 @@ module UFO_Mechanics : UFO = struct
   let move_ufo x = 
     let new_pos = add_v x.u_pos x.u_vel in
     {x with u_pos = new_pos}
+  let batch_ufo l =
+    List.fold_left (fun acc x -> 
+      if (snd x) mod cUFO_MOVE_INTERVAL = 0 && (snd x) > cUFO_MOVE_INTERVAL then
+        let j = move_ufo (redirect (fst x)) in
+        (j,(snd x)+1)::acc
+      else
+        let k = move_ufo (fst x) in
+        (k,(snd x)+1)::acc) [] l
 end

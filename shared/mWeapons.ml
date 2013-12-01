@@ -2,7 +2,6 @@ open Definitions
 open Constants
 open Util
 open MTeams
-open Game
 
 (* Handle weapon functionality - Bullets *)
 module type Weapons = sig
@@ -18,9 +17,11 @@ module type Weapons = sig
     int -> bullet list -> position -> bullet list
   (* Check to see if a point is outside of field *)
   val is_impassable : vector -> bool
-  (* Move Bullet - Dodge this Neo! 
+  (* Move Bullet - Update pos. and accel. Dodge this Neo! 
    * If still in field, then Some bullet else return None *)
   val metal_move : bullet -> bullet option
+  (* Update list of bullets, removing those that are off the field *)
+  val batch_bullets : bullet list -> bullet list
 end
 
 module Weapon_Mechanics : Weapons = struct
@@ -71,7 +72,7 @@ module Weapon_Mechanics : Weapons = struct
       trail targ acc col (tracker + 1) 
         (b_straight::b_left::b_right::storage) position
   let deploy col arg pos = match arg with
-  | Shoot (x,y,z) -> match x with
+  | Shoot (x,y,z) -> begin match x with
     | Spread -> 
       (* Check edge case *)
       if cSPREAD_NUM <= 0 then []
@@ -85,7 +86,7 @@ module Weapon_Mechanics : Weapons = struct
       if cTRAIL_NUM <= 0 then []
       (* Create new trail bullets *)
       else trail y z col 0 [] pos
-    | Power -> [] (* Unavailable bullet type *)
+    | Power -> [] (* Unavailable bullet type *) end
   | _ -> failwith "Invalid weapons command. Report to your superior!"
   let is_impassable x = 
     let x_val = int_of_float (fst x) in 
@@ -100,4 +101,9 @@ module Weapon_Mechanics : Weapons = struct
       Some {b_type = x.b_type; b_id = x.b_id; b_pos = new_pos;
         b_vel = new_vel; b_accel = x.b_accel; b_radius = x.b_radius;
         b_color = x.b_color}
+  let batch_bullets b =
+    List.fold_left (fun a x ->
+      match metal_move x with
+      | Some y -> y::a
+      | None -> a) [] b
 end

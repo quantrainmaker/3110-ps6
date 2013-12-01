@@ -54,7 +54,7 @@ module type Team_Data = sig
   (* Initial Blue Team *)
   val base_blue : team_data
   (* Check for dead character *)
-  val life_check : team_data -> bool
+  val death_check : team_data -> bool
   (* Toggle character focused state *)
   val toggle_focus : bool -> team_data -> team_data
   (* Get team charge *)
@@ -67,6 +67,8 @@ module type Team_Data = sig
   val war_ready : team_data -> bool
   (* Remove bombs from the team *)
   val disarm_bomber : team_data -> team_data
+  (* Determines if game has ended *)
+  val check_endgame : team_data -> team_data -> result
 end
 
 (* Team functions *)
@@ -75,7 +77,7 @@ module Team_Mechanics : Team_Data = struct
     (cINITIAL_LIVES,cINITIAL_BOMBS,0,0,0,Player_Mechanics.red_char)
   let base_blue : team_data = 
     (cINITIAL_LIVES,cINITIAL_BOMBS,0,0,0,Player_Mechanics.blue_char)
-  let life_check pl = match pl with 
+  let death_check pl = match pl with 
   | (l,b,s,p,c,pl) -> if l = 0 then true else false
   let toggle_focus b t = match t with
   | (l,q,s,p,c,pl) -> 
@@ -91,4 +93,15 @@ module Team_Mechanics : Team_Data = struct
   | (l,q,s,p,c,pl) -> if q > 0 then true else false
   let disarm_bomber i = match i with
   | (l,q,s,p,c,pl) -> (l,(q-1),s,p,c,pl)
+  let check_endgame x y =
+    match x with
+    | (a,b,c,d,e,f) -> match y with
+      | (g,h,i,j,k,l) -> 
+        if death_check x && death_check y then
+          if c > i then Winner f.p_color
+          else if i > c then Winner l.p_color
+          else Tie
+        else if death_check x then Winner l.p_color
+        else if death_check y then Winner f.p_color
+        else Unfinished
 end
