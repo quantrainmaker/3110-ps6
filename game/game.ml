@@ -25,10 +25,22 @@ let init_game () : game =
   
 (* Updates the game state by a single time step *)
 let handle_time game =
-  failwith "abort!"
+  (* Continually edit parse_game for the current time_step *)
+  (* let parse_game = game in *)
+  (* Update UFO positions and velocities (if needed) *)
+
+  (* Toggle player focus *)
+
+  (* Update player positions *)
+
+  (* Check for player and bullet collisions *)
+
+  (* Check for UFO and bullet collisions *)
 
   (* Check for endgame conditions *)
-  
+  (* if Team_Mechanics.death_check game.redx && 
+    Team_Mechanics.death_check game.bluex then *)
+  failwith "todo"
 
 (* Handles commands from the AIs - immediately update game state *)
 let handle_action gamma col act = match act with
@@ -90,3 +102,4 @@ let get_data game =
   let get_ufos l = 
     List.fold_left (fun a b -> (fst b)::a) [] l in
   (game.redx, game.bluex, get_ufos (game.ufox), game.bl, game.pl)
+
