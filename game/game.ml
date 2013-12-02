@@ -97,10 +97,19 @@ let handle_time game =
         parse_game.bluex) ()
     else parse_game.bluex;
 
-  (* Check for ufo - bullet collisions - update ufos and update bullets *) 
-  (* TODO - INCOMPLETE *)
-  parse_game.ufox <- parse_game.ufox;
-  parse_game.bl <- parse_game.bl;
+  (* Update ufo hitcounts from bullet collisions*) 
+  parse_game.ufox <- Collision_Mechanics.ufo_test
+    parse_game.ufox parse_game.bl;
+
+  (* Remove bullets that hit ufos *)
+  parse_game.bl <- Collision_Mechanics.unhit_bullets 
+    parse_game.ufox parse_game.bl;
+
+  (* Scatter powerups for all destroyed ufos *)
+  (* TODO *)
+
+  (* Delete ufos that have been destroyed *)
+  (* TODO *)
   
   (* If player - bullet collision with no invincibility, 
    * remove all bullets from the game *)
@@ -118,12 +127,12 @@ let handle_time game =
     (Collision_Mechanics.power_count parse_game.pl 
       (Team_Mechanics.find_rambo parse_game.redx));
 
-  (* Check for blue player - powerup collisions *)
+  (* Check for blue player - powerup collisions - add power *)
   parse_game.bluex <- Team_Mechanics.arm_rambo parse_game.bluex 
     (Collision_Mechanics.power_count parse_game.pl 
       (Team_Mechanics.find_rambo parse_game.bluex));
 
-  (* Remove powerups from field is collide with player *)
+  (* Remove powerups from field that collide with player *)
   parse_game.pl <- Collision_Mechanics.unhit_powers parse_game.pl 
     (Team_Mechanics.find_rambo parse_game.redx);
 

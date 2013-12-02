@@ -21,9 +21,15 @@ module type Collision = sig
   val power_count : power list -> player_char -> int
   (* Returns power list of powers that were not hit *)
   val unhit_powers : power list -> player_char -> power list
+  (* Updates ufo according to bullet list *)
+  val ufo_bullets_update : ufo -> bullet list -> ufo
   (* Tests all ufos with all bullets for collisions - Returns ufos
-   * with proper health *)
-  val ufo_test : ufo*int list -> bullet list -> ufo*int list
+   * with proper hitcount *)
+  val ufo_test : (ufo*int) list -> bullet list -> (ufo*int) list
+  (* Detect if a given bullet collides with any ufos *)
+  val dead_bullet : ufo list -> bullet -> bool
+  (* Return the list of bullets not hit by the ufos *)
+  val unhit_bullets : (ufo*int) list -> bullet list -> bullet list
 end
 
 module Collision_Mechanics : Collision = struct
@@ -42,5 +48,20 @@ module Collision_Mechanics : Collision = struct
     List.fold_left (fun acc x -> if power_test pc x then (acc+1) else acc) 0 pl
   let unhit_powers pl pc =
     List.fold_left (fun acc x -> if power_test pc x then acc else (x::acc)) [] pl
-  let ufo_test x y = failwith "todo"
+  let ufo_bullets_update u bl =
+    List.fold_left (fun acc x -> 
+      if ufo_bullet_test acc x then
+        if x.b_color = Red then
+          {acc with u_red_hits = (acc.u_red_hits+1)}
+        else {acc with u_blue_hits = (acc.u_blue_hits+1)}
+      else acc) u bl
+  let ufo_test x y = 
+    List.fold_left (fun acc a -> 
+      ((ufo_bullets_update (fst a) y),snd a)::acc) [] x
+  let dead_bullet u b = 
+    List.fold_left (fun acc x -> if ufo_bullet_test x b then true else acc) false u
+  let unhit_bullets u b = 
+    let ufo_list = List.map (fun a -> fst a) u in
+    List.fold_left (fun acc x -> 
+      if dead_bullet ufo_list x then acc else (x::acc)) [] b
 end
