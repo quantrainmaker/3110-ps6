@@ -1,0 +1,51 @@
+game/game.cmo : shared/util.cmo shared/mWeapons.cmo shared/mUfos.cmo \
+    shared/mTeams.cmo shared/mCollisions.cmo shared/definitions.cmo \
+    shared/constants.cmo game/game.cmi
+game/game.cmx : shared/util.cmx shared/mWeapons.cmx shared/mUfos.cmx \
+    shared/mTeams.cmx shared/mCollisions.cmx shared/definitions.cmx \
+    shared/constants.cmx game/game.cmi
+game/game.cmi : shared/definitions.cmo shared/constants.cmo
+game/netgraphics.cmo : shared/util.cmo shared/definitions.cmo \
+    shared/connection.cmi game/netgraphics.cmi
+game/netgraphics.cmx : shared/util.cmx shared/definitions.cmx \
+    shared/connection.cmx game/netgraphics.cmi
+game/netgraphics.cmi : shared/definitions.cmo
+game/server.cmo : shared/util.cmo game/netgraphics.cmi game/game.cmi \
+    shared/definitions.cmo shared/constants.cmo shared/connection.cmi
+game/server.cmx : shared/util.cmx game/netgraphics.cmx game/game.cmx \
+    shared/definitions.cmx shared/constants.cmx shared/connection.cmx
+shared/connection.cmo : shared/connection.cmi
+shared/connection.cmx : shared/connection.cmi
+shared/connection.cmi :
+shared/constants.cmo :
+shared/constants.cmx :
+shared/definitions.cmo :
+shared/definitions.cmx :
+shared/mCollisions.cmo : shared/util.cmo shared/mWeapons.cmo \
+    shared/mUfos.cmo shared/mTeams.cmo shared/definitions.cmo \
+    shared/constants.cmo
+shared/mCollisions.cmx : shared/util.cmx shared/mWeapons.cmx \
+    shared/mUfos.cmx shared/mTeams.cmx shared/definitions.cmx \
+    shared/constants.cmx
+shared/mTeams.cmo : shared/util.cmo shared/definitions.cmo \
+    shared/constants.cmo
+shared/mTeams.cmx : shared/util.cmx shared/definitions.cmx \
+    shared/constants.cmx
+shared/mUfos.cmo : shared/util.cmo shared/definitions.cmo \
+    shared/constants.cmo
+shared/mUfos.cmx : shared/util.cmx shared/definitions.cmx \
+    shared/constants.cmx
+shared/mWeapons.cmo : shared/util.cmo shared/mTeams.cmo \
+    shared/definitions.cmo shared/constants.cmo
+shared/mWeapons.cmx : shared/util.cmx shared/mTeams.cmx \
+    shared/definitions.cmx shared/constants.cmx
+shared/util.cmo : shared/definitions.cmo shared/constants.cmo
+shared/util.cmx : shared/definitions.cmx shared/constants.cmx
+team/babybot.cmo : shared/util.cmo team/team.cmo shared/definitions.cmo \
+    shared/constants.cmo
+team/babybot.cmx : shared/util.cmx team/team.cmx shared/definitions.cmx \
+    shared/constants.cmx
+team/team.cmo : shared/util.cmo shared/definitions.cmo shared/constants.cmo \
+    shared/connection.cmi
+team/team.cmx : shared/util.cmx shared/definitions.cmx shared/constants.cmx \
+    shared/connection.cmx

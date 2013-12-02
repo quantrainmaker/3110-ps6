@@ -12,23 +12,36 @@ open MCollisions
  * to include creation time to track when to change direction.
  * Invincibilities stored separately for each team to track times. 
  * Also store bool to track if player was hit *)
-type game = {mutable redx : team_data; mutable bluex : team_data; 
-  mutable ufox : (ufo*int) list; mutable bl : bullet list; 
-  mutable pl : power list; mutable time_el : int; 
+type game = {
+  mutable redx : team_data;
+  mutable bluex : team_data; 
+  mutable ufox : (ufo*int) list; 
+  mutable bl : bullet list; 
+  mutable pl : power list; 
+  mutable time_el : int; 
   mutable rm : (direction * direction) list; 
   mutable bm : (direction * direction) list;
   mutable mri : int;
   mutable mbi : int;
   mutable bri : int;
-  mutable bbi : int;}
+  mutable bbi : int;
+}
 
 (* Initializes and returns starting game state *)
-let init_game () : game = 
-  {redx = Team_Mechanics.base_red; 
-    bluex = Team_Mechanics.base_blue; ufox = []; 
-    bl = []; pl = []; time_el = 0; rm = []; bm = [];
-    mri = 0; mbi = 0;
-    bri = 0; bbi = 0;}
+let init_game () : game = {
+  redx = Team_Mechanics.base_red; 
+  bluex = Team_Mechanics.base_blue; 
+  ufox = []; 
+  bl = [];
+  pl = []; 
+  time_el = 0; 
+  rm = []; 
+  bm = [];
+  mri = 0; 
+  mbi = 0;
+  bri = 0; 
+  bbi = 0;
+}
 
 (* Updates the game state by a single time step *)
 let handle_time game = 
@@ -73,11 +86,11 @@ let handle_time game =
 
   (* Check for red team hit by a bullet *)
   parse_game.redx <-
-    if Team_Mechanics.protection parse_game.mri parse_game.bri then
-    parse_game.redx
+    if Team_Mechanics.protection parse_game.mri parse_game.bri 
+    then parse_game.redx
     else if Collision_Mechanics.valid_hit parse_game.bl 
-      (Team_Mechanics.find_rambo parse_game.redx) then
-      (fun () -> 
+      (Team_Mechanics.find_rambo parse_game.redx) 
+      then (fun () -> 
       	parse_game.mri <- cINVINCIBLE_FRAMES;
         parse_game.redx <- Team_Mechanics.reset_bullet_hit parse_game.redx;
         parse_game.bluex <- Team_Mechanics.award_medal parse_game.bluex;
@@ -86,11 +99,11 @@ let handle_time game =
 
   (* Check for blue team hit by a bullet *)
   parse_game.bluex <-
-    if Team_Mechanics.protection parse_game.mbi parse_game.bbi  then
-    parse_game.bluex
+    if Team_Mechanics.protection parse_game.mbi parse_game.bbi  
+    then parse_game.bluex
     else if Collision_Mechanics.valid_hit parse_game.bl 
-      (Team_Mechanics.find_rambo parse_game.bluex) then
-      (fun () -> 
+      (Team_Mechanics.find_rambo parse_game.bluex) 
+      then (fun () -> 
       	parse_game.mbi <- cINVINCIBLE_FRAMES;
         parse_game.bluex <- Team_Mechanics.reset_bullet_hit parse_game.bluex;
         parse_game.redx <- Team_Mechanics.award_medal parse_game.redx;
@@ -119,8 +132,9 @@ let handle_time game =
       not (Team_Mechanics.protection parse_game.mri parse_game.bri)) || 
       (Collision_Mechanics.valid_hit parse_game.bl  
       (Team_Mechanics.find_rambo parse_game.bluex) && 
-      not (Team_Mechanics.protection parse_game.mbi parse_game.bbi)) then
-      [] else parse_game.bl; 
+      not (Team_Mechanics.protection parse_game.mbi parse_game.bbi)) 
+    then [] 
+    else parse_game.bl; 
     
   (* Check for red player - powerup collisions - add power *)
   parse_game.redx <- Team_Mechanics.arm_rambo parse_game.redx 
@@ -151,14 +165,16 @@ let handle_time game =
 let handle_action gamma col act = match act with
 (* Update move list *)
 | Move d -> 
-  if col = Red then {gamma with rm = d}
+  if col = Red 
+  then {gamma with rm = d}
   else {gamma with bm = d}
 (* Handle shot request *)
 | Shoot (b,c,d) -> 
   if col = Red then
     (* If Red has enough charge, get bullet list, add bullets to game,
      * subtract cost *)
-    if Team_Mechanics.get_charge gamma.redx >= cost_of_bullet b then
+    if Team_Mechanics.get_charge gamma.redx >= cost_of_bullet b 
+    then
       let location = Team_Mechanics.locate_rambo gamma.redx in
       let r = Weapon_Mechanics.deploy col act location in
       let n = gamma in
@@ -168,7 +184,8 @@ let handle_action gamma col act = match act with
   else 
     (* If Blue has enough charge, get bullet list, add bullets to game,
      * subtract cost *)
-    if Team_Mechanics.get_charge gamma.bluex >= cost_of_bullet b then
+    if Team_Mechanics.get_charge gamma.bluex >= cost_of_bullet b 
+    then
       let location = Team_Mechanics.locate_rambo gamma.bluex in
       let r = Weapon_Mechanics.deploy col act location in
       let n = gamma in
@@ -177,7 +194,8 @@ let handle_action gamma col act = match act with
     else gamma
 (* Toggle focused state *)
 | Focus a ->
-  if col = Red then
+  if col = Red 
+  then
     let new_red = Team_Mechanics.toggle_focus a gamma.redx in
     {gamma with redx = new_red}
   else
@@ -186,7 +204,8 @@ let handle_action gamma col act = match act with
 (* Set off a bomb - Kaboom! *)
 | Bomb -> 
   if col = Red then
-    if Team_Mechanics.war_ready gamma.redx then
+    if Team_Mechanics.war_ready gamma.redx 
+    then
       let n = gamma in
       n.bl <- []; (* Remove all bullets *)
       n.redx <- Team_Mechanics.disarm_bomber n.redx; (* Remove bomb *)
@@ -194,7 +213,8 @@ let handle_action gamma col act = match act with
       n   
     else gamma
   else
-    if Team_Mechanics.war_ready gamma.bluex then 
+    if Team_Mechanics.war_ready gamma.bluex 
+    then 
       let n = gamma in
       n.bl <- []; (* Remove all bullets *)
       n.bluex <- Team_Mechanics.disarm_bomber n.bluex; (* Remove bomb *)
