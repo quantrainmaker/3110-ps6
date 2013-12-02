@@ -4,8 +4,6 @@ open Util
 
 (* Module signature to maintain data for a player (Red or Blue) *)
 module type Player_Data = sig
-  (* Check to see if a point is outside of field *)
-  val is_impassable : vector -> bool
   (* Initial Red Character *)
   val red_char : player_char
   (* Initial Blue Character *)
@@ -18,11 +16,6 @@ end
 
 (* Player functions *)
 module Player_Mechanics = struct
-  let is_impassable x = 
-    let x_val = fst x in 
-    let y_val = snd x in
-    x_val >= 0.0 && x_val <= float_of_int (cBOARD_WIDTH) && 
-    y_val >= 0.0 && y_val <= float_of_int (cBOARD_HEIGHT)
   let red_char = 
     let pos = (0.125 *. float_of_int (cBOARD_WIDTH), 
       0.50 *. float_of_int (cBOARD_HEIGHT)) in   
@@ -38,13 +31,13 @@ module Player_Mechanics = struct
     if player.p_focused then
       let path = vector_of_dirs track (float_of_int cFOCUSED_SPEED) in
       let new_pos = add_v path player.p_pos in
-      if is_impassable new_pos then player
-      else {player with p_pos = new_pos}
+      if in_bounds new_pos then {player with p_pos = new_pos} 
+      else player
     else
       let path = vector_of_dirs track (float_of_int cUNFOCUSED_SPEED) in
       let new_pos = add_v path player.p_pos in
-      if is_impassable new_pos then player
-      else {player with p_pos = new_pos}
+      if in_bounds new_pos then {player with p_pos = new_pos} 
+      else player
 end
 
 (* Module signature to maintain data for a team (Red or Blue) *)
