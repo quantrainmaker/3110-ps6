@@ -55,8 +55,8 @@ let handle_time game =
   (* Spawn a new UFO if needed *)
   parse_game.ufox <- 
     if parse_game.time_el > 0 && 
-      parse_game.time_el mod cUFO_SPAWN_INTERVAL = 0 then
-      (UFO_Mechanics.base_ufo (),parse_game.time_el)::parse_game.ufox
+      parse_game.time_el mod cUFO_SPAWN_INTERVAL = 0 
+    then (UFO_Mechanics.base_ufo (),parse_game.time_el)::parse_game.ufox
     else parse_game.ufox;
 
   (* Update current bullet positions and velocities - removing those
@@ -163,64 +163,65 @@ let handle_time game =
 
 (* Handles commands from the AIs - immediately update game state *)
 let handle_action gamma col act = match act with
-(* Update move list *)
-| Move d -> 
-  if col = Red 
-  then {gamma with rm = d}
-  else {gamma with bm = d}
-(* Handle shot request *)
-| Shoot (b,c,d) -> 
-  if col = Red then
-    (* If Red has enough charge, get bullet list, add bullets to game,
-     * subtract cost *)
-    if Team_Mechanics.get_charge gamma.redx >= cost_of_bullet b 
+  (* Update move list *)
+  | Move d -> 
+    if col = Red 
+    then {gamma with rm = d}
+    else {gamma with bm = d}
+  (* Handle shot request *)
+  | Shoot (b,c,d) -> 
+    if col = Red then
+      (* If Red has enough charge, get bullet list, add bullets to game,
+       * subtract cost *)
+      if Team_Mechanics.get_charge gamma.redx >= cost_of_bullet b 
+      then
+        let location = Team_Mechanics.locate_rambo gamma.redx in
+        let r = Weapon_Mechanics.deploy col act location in
+        let n = gamma in
+        n.redx <- Team_Mechanics.rem_charge n.redx (cost_of_bullet b);
+        n.bl <- (List.append r (n.bl)); n
+      else gamma
+    else 
+      (* If Blue has enough charge, get bullet list, add bullets to game,
+       * subtract cost *)
+      if Team_Mechanics.get_charge gamma.bluex >= cost_of_bullet b 
+      then
+        let location = Team_Mechanics.locate_rambo gamma.bluex in
+        let r = Weapon_Mechanics.deploy col act location in
+        let n = gamma in
+        n.bluex <- Team_Mechanics.rem_charge n.bluex (cost_of_bullet b);
+        n.bl <- (List.append r (n.bl)); 
+        n
+      else gamma
+  (* Toggle focused state *)
+  | Focus a ->
+    if col = Red 
     then
-      let location = Team_Mechanics.locate_rambo gamma.redx in
-      let r = Weapon_Mechanics.deploy col act location in
-      let n = gamma in
-      n.redx <- Team_Mechanics.rem_charge n.redx (cost_of_bullet b);
-      n.bl <- (List.append r (n.bl)); n
-    else gamma
-  else 
-    (* If Blue has enough charge, get bullet list, add bullets to game,
-     * subtract cost *)
-    if Team_Mechanics.get_charge gamma.bluex >= cost_of_bullet b 
-    then
-      let location = Team_Mechanics.locate_rambo gamma.bluex in
-      let r = Weapon_Mechanics.deploy col act location in
-      let n = gamma in
-      n.bluex <- Team_Mechanics.rem_charge n.bluex (cost_of_bullet b);
-      n.bl <- (List.append r (n.bl)); n
-    else gamma
-(* Toggle focused state *)
-| Focus a ->
-  if col = Red 
-  then
-    let new_red = Team_Mechanics.toggle_focus a gamma.redx in
-    {gamma with redx = new_red}
-  else
-    let new_blue = Team_Mechanics.toggle_focus a gamma.bluex in
-    {gamma with bluex = new_blue}
-(* Set off a bomb - Kaboom! *)
-| Bomb -> 
-  if col = Red then
-    if Team_Mechanics.war_ready gamma.redx 
-    then
-      let n = gamma in
-      n.bl <- []; (* Remove all bullets *)
-      n.redx <- Team_Mechanics.disarm_bomber n.redx; (* Remove bomb *)
-      n.bri <- cBOMB_DURATION; (* Add invincibility *)
-      n   
-    else gamma
-  else
-    if Team_Mechanics.war_ready gamma.bluex 
-    then 
-      let n = gamma in
-      n.bl <- []; (* Remove all bullets *)
-      n.bluex <- Team_Mechanics.disarm_bomber n.bluex; (* Remove bomb *)
-      n.bbi <- cBOMB_DURATION; (* Add invincibility *)
-      n 
-    else gamma
+      let new_red = Team_Mechanics.toggle_focus a gamma.redx in
+      {gamma with redx = new_red}
+    else
+      let new_blue = Team_Mechanics.toggle_focus a gamma.bluex in
+      {gamma with bluex = new_blue}
+  (* Set off a bomb - Kaboom! *)
+  | Bomb -> 
+    if col = Red then
+      if Team_Mechanics.war_ready gamma.redx 
+      then
+        let n = gamma in
+        n.bl <- []; (* Remove all bullets *)
+        n.redx <- Team_Mechanics.disarm_bomber n.redx; (* Remove bomb *)
+        n.bri <- cBOMB_DURATION; (* Add invincibility *)
+        n   
+      else gamma
+    else
+      if Team_Mechanics.war_ready gamma.bluex 
+      then 
+        let n = gamma in
+        n.bl <- []; (* Remove all bullets *)
+        n.bluex <- Team_Mechanics.disarm_bomber n.bluex; (* Remove bomb *)
+        n.bbi <- cBOMB_DURATION; (* Add invincibility *)
+        n 
+      else gamma
 
 (* Return game data to bots *)
 let get_data game = 

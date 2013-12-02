@@ -45,9 +45,11 @@ module Collision_Mechanics : Collision = struct
   let power_test pc po = (distance pc.p_pos po.b_pos <= 
     float_of_int (pc.p_radius + po.b_radius))
   let power_count pl pc = 
-    List.fold_left (fun acc x -> if power_test pc x then (acc+1) else acc) 0 pl
+    List.fold_left 
+      (fun acc x -> if power_test pc x then (acc+1) else acc) 0 pl
   let unhit_powers pl pc =
-    List.fold_left (fun acc x -> if power_test pc x then acc else (x::acc)) [] pl
+    List.fold_left 
+      (fun acc x -> if power_test pc x then acc else (x::acc)) [] pl
   let ufo_bullets_update u bl =
     List.fold_left (fun acc x -> 
       if ufo_bullet_test acc x then
@@ -59,7 +61,8 @@ module Collision_Mechanics : Collision = struct
     List.fold_left (fun acc a -> 
       ((ufo_bullets_update (fst a) y),snd a)::acc) [] x
   let dead_bullet u b = 
-    List.fold_left (fun acc x -> if ufo_bullet_test x b then true else acc) false u
+    List.fold_left 
+      (fun acc x -> if ufo_bullet_test x b then true else acc) false u
   let unhit_bullets u b = 
     let ufo_list = List.map (fun a -> fst a) u in
     List.fold_left (fun acc x -> 

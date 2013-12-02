@@ -94,21 +94,21 @@ module Team_Mechanics : Team_Data = struct
   let base_blue : team_data = 
     (cINITIAL_LIVES,cINITIAL_BOMBS,0,0,0,Player_Mechanics.blue_char)
   let death_check pl = match pl with 
-  | (l,b,s,p,c,pl) -> if l = 0 then true else false
+    | (l,b,s,p,c,pl) -> if l = 0 then true else false
   let toggle_focus b t = match t with
-  | (l,q,s,p,c,pl) -> 
-    let npl = Player_Mechanics.refocus pl b in
-    (l,q,s,p,c,npl)
+    | (l,q,s,p,c,pl) -> 
+      let npl = Player_Mechanics.refocus pl b in
+      (l,q,s,p,c,npl)
   let get_charge t = match t with
-  | (l,q,s,p,c,pl) -> c
+    | (l,q,s,p,c,pl) -> c
   let rem_charge t i = match t with
-  | (l,q,s,p,c,pl) -> (l,q,s,p,(c-i),pl)
+    | (l,q,s,p,c,pl) -> (l,q,s,p,(c-i),pl)
   let locate_rambo i = match i with
-  | (l,q,s,p,c,pl) -> pl.p_pos
+    | (l,q,s,p,c,pl) -> pl.p_pos
   let war_ready i = match i with
-  | (l,q,s,p,c,pl) -> if q > 0 then true else false
+    | (l,q,s,p,c,pl) -> if q > 0 then true else false
   let disarm_bomber i = match i with
-  | (l,q,s,p,c,pl) -> (l,(q-1),s,p,c,pl)
+    | (l,q,s,p,c,pl) -> (l,(q-1),s,p,c,pl)
   let check_endgame x y =
     match x with
     | (a,b,c,d,e,f) -> match y with
@@ -121,22 +121,22 @@ module Team_Mechanics : Team_Data = struct
         else if death_check y then Winner f.p_color
         else Unfinished
   let recruit_rambo t d = match t with
-  | (l,q,s,p,c,pl) -> 
-    begin match d with
-    | [] -> (l,q,s,p,c,pl)
-    | head::tail ->
-      let npl = Player_Mechanics.keep_moving pl head in
-      (l,q,s,p,c,npl) end
+    | (l,q,s,p,c,pl) -> 
+      begin match d with
+      | [] -> (l,q,s,p,c,pl)
+      | head::tail ->
+        let npl = Player_Mechanics.keep_moving pl head in
+        (l,q,s,p,c,npl) end
   let alter_orders d = match d with
-  | [] -> []
-  | head::tail -> tail
+    | [] -> []
+    | head::tail -> tail
   let find_rambo x = match x with
-  | (l,q,s,p,c,pl) -> pl
+    | (l,q,s,p,c,pl) -> pl
   let award_medal x = match x with
-  | (l,q,s,p,c,pl) -> (l,q,(s + cKILL_POINTS),p,c,pl)
+    | (l,q,s,p,c,pl) -> (l,q,(s + cKILL_POINTS),p,c,pl)
   let reset_bullet_hit x = match x with
-  | (l,q,s,p,c,pl) -> ((l-1),cINITIAL_BOMBS,s,(p/2),c,pl)
+    | (l,q,s,p,c,pl) -> ((l-1),cINITIAL_BOMBS,s,(p/2),c,pl)
   let protection x y = x > 0 || y > 0
   let arm_rambo x y = match x with
-  | (l,q,s,p,c,pl) -> (l,q,s,(p+y),c,pl)
+    | (l,q,s,p,c,pl) -> (l,q,s,(p+y),c,pl)
 end

@@ -74,22 +74,22 @@ module Weapon_Mechanics : Weapons = struct
       trail targ acc col (tracker + 1) 
         (b_straight::b_left::b_right::storage) position
   let deploy col arg pos = match arg with
-  | Shoot (x,y,z) -> begin match x with
-    | Spread -> 
-      (* Check edge case *)
-      if cSPREAD_NUM <= 0 then []
-      (* Create new spread bullets *)
-      else spread y z col 0.0 [] pos
-    | Bubble ->
-      (* Create new bubble bullet *)
-      bubble y z col pos
-    | Trail ->
-      (* Check edge case *)
-      if cTRAIL_NUM <= 0 then []
-      (* Create new trail bullets *)
-      else trail y z col 0 [] pos
-    | Power -> [] (* Unavailable bullet type *) end
-  | _ -> failwith "Invalid weapons command. Report to your superior!"
+    | Shoot (x,y,z) -> begin match x with
+      | Spread -> 
+        (* Check edge case *)
+        if cSPREAD_NUM <= 0 then []
+        (* Create new spread bullets *)
+        else spread y z col 0.0 [] pos
+      | Bubble ->
+        (* Create new bubble bullet *)
+        bubble y z col pos
+      | Trail ->
+        (* Check edge case *)
+        if cTRAIL_NUM <= 0 then []
+        (* Create new trail bullets *)
+        else trail y z col 0 [] pos
+      | Power -> [] (* Unavailable bullet type *) end
+    | _ -> failwith "Invalid weapons command. Report to your superior!"
   let is_impassable x = 
     let x_val = fst x in 
     let y_val = snd x in
