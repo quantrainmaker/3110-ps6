@@ -6,6 +6,11 @@ open MTeams
 open MWeapons
 open MCollisions
 
+module TM = Team_Mechanics
+module CM = Collision_Mechanics
+module WM = Weapon_Mechanics
+module UM = UFO_Mechanics
+
 (* Record for holding game information.
  * Includes Red/blue teams, Ufos, Bullets, Powerups, Time Elapsed,
  * Pending Red Moves and Pending blue Moves. Store Ufos as tuple
@@ -29,8 +34,8 @@ type game = {
 
 (* Initializes and returns starting game state *)
 let init_game () : game = {
-  redx = Team_Mechanics.base_red; 
-  bluex = Team_Mechanics.base_blue; 
+  redx = TM.base_red; 
+  bluex = TM.base_blue; 
   ufox = []; 
   bl = [];
   pl = []; 
@@ -50,72 +55,72 @@ let handle_time game =
 
   (* Update current ufo positions (and velocities if needed) *)
   parse_game.ufox <- 
-    UFO_Mechanics.batch_ufo parse_game.ufox parse_game.time_el;
+    UM.batch_ufo parse_game.ufox parse_game.time_el;
 
   (* Spawn a new UFO if needed *)
   parse_game.ufox <- 
     if parse_game.time_el > 0 && 
       parse_game.time_el mod cUFO_SPAWN_INTERVAL = 0 
-    then (UFO_Mechanics.base_ufo (),parse_game.time_el)::parse_game.ufox
+    then (UM.base_ufo (),parse_game.time_el)::parse_game.ufox
     else parse_game.ufox;
 
   (* Update current bullet positions and velocities - removing those
    * that go off the field. *)
-  parse_game.bl <- Weapon_Mechanics.batch_bullets parse_game.bl;
+  parse_game.bl <- WM.batch_bullets parse_game.bl;
 
   (* Update powerup positions - removing those that leave the field *)
-  parse_game.pl <- Weapon_Mechanics.batch_powerups parse_game.pl;
+  parse_game.pl <- WM.batch_powerups parse_game.pl;
 
   (* Update player positions and player move lists*)
   parse_game.redx <- 
-    Team_Mechanics.recruit_rambo parse_game.redx parse_game.rm;
-  parse_game.rm <- Team_Mechanics.alter_orders parse_game.rm;
+    TM.recruit_rambo parse_game.redx parse_game.rm;
+  parse_game.rm <- TM.alter_orders parse_game.rm;
   parse_game.bluex <- 
-    Team_Mechanics.recruit_rambo parse_game.bluex parse_game.bm;
-  parse_game.bm <- Team_Mechanics.alter_orders parse_game.bm;
+    TM.recruit_rambo parse_game.bluex parse_game.bm;
+  parse_game.bm <- TM.alter_orders parse_game.bm;
 
   (* Decrement invincibilities by one if greater than zero *)
   parse_game.mri <- 
-    Collision_Mechanics.weaken_shield parse_game.mri;
+    CM.weaken_shield parse_game.mri;
   parse_game.mbi <- 
-    Collision_Mechanics.weaken_shield parse_game.mbi;
+    CM.weaken_shield parse_game.mbi;
   parse_game.bri <-
-    Collision_Mechanics.weaken_shield parse_game.bri;
+    CM.weaken_shield parse_game.bri;
   parse_game.bbi <-
-    Collision_Mechanics.weaken_shield parse_game.bbi;
+    CM.weaken_shield parse_game.bbi;
 
   (* Check for red team hit by a bullet *)
   parse_game.redx <-
-    if Team_Mechanics.protection parse_game.mri parse_game.bri 
+    if TM.protection parse_game.mri parse_game.bri 
     then parse_game.redx
-    else if Collision_Mechanics.valid_hit parse_game.bl 
-      (Team_Mechanics.find_rambo parse_game.redx) 
+    else if CM.valid_hit parse_game.bl 
+      (TM.find_rambo parse_game.redx) 
       then (fun () -> 
       	parse_game.mri <- cINVINCIBLE_FRAMES;
-        parse_game.redx <- Team_Mechanics.reset_bullet_hit parse_game.redx;
-        parse_game.bluex <- Team_Mechanics.award_medal parse_game.bluex;
+        parse_game.redx <- TM.reset_bullet_hit parse_game.redx;
+        parse_game.bluex <- TM.award_medal parse_game.bluex;
         parse_game.redx) ()
     else parse_game.redx;
 
   (* Check for blue team hit by a bullet *)
   parse_game.bluex <-
-    if Team_Mechanics.protection parse_game.mbi parse_game.bbi  
+    if TM.protection parse_game.mbi parse_game.bbi  
     then parse_game.bluex
-    else if Collision_Mechanics.valid_hit parse_game.bl 
-      (Team_Mechanics.find_rambo parse_game.bluex) 
+    else if CM.valid_hit parse_game.bl 
+      (TM.find_rambo parse_game.bluex) 
       then (fun () -> 
       	parse_game.mbi <- cINVINCIBLE_FRAMES;
-        parse_game.bluex <- Team_Mechanics.reset_bullet_hit parse_game.bluex;
-        parse_game.redx <- Team_Mechanics.award_medal parse_game.redx;
+        parse_game.bluex <- TM.reset_bullet_hit parse_game.bluex;
+        parse_game.redx <- TM.award_medal parse_game.redx;
         parse_game.bluex) ()
     else parse_game.bluex;
 
   (* Update ufo hitcounts from bullet collisions*) 
-  parse_game.ufox <- Collision_Mechanics.ufo_test
+  parse_game.ufox <- CM.ufo_test
     parse_game.ufox parse_game.bl;
 
   (* Remove bullets that hit ufos *)
-  parse_game.bl <- Collision_Mechanics.unhit_bullets 
+  parse_game.bl <- CM.unhit_bullets 
     parse_game.ufox parse_game.bl;
 
   (* Scatter powerups for all destroyed ufos *)
@@ -127,38 +132,38 @@ let handle_time game =
   (* If player - bullet collision with no invincibility, 
    * remove all bullets from the game *)
   parse_game.bl <- 
-    if (Collision_Mechanics.valid_hit parse_game.bl 
-      (Team_Mechanics.find_rambo parse_game.redx) && 
-      not (Team_Mechanics.protection parse_game.mri parse_game.bri)) || 
-      (Collision_Mechanics.valid_hit parse_game.bl  
-      (Team_Mechanics.find_rambo parse_game.bluex) && 
-      not (Team_Mechanics.protection parse_game.mbi parse_game.bbi)) 
+    if (CM.valid_hit parse_game.bl 
+      (TM.find_rambo parse_game.redx) && 
+      not (TM.protection parse_game.mri parse_game.bri)) || 
+      (CM.valid_hit parse_game.bl  
+      (TM.find_rambo parse_game.bluex) && 
+      not (TM.protection parse_game.mbi parse_game.bbi)) 
     then [] 
     else parse_game.bl; 
     
   (* Check for red player - powerup collisions - add power *)
-  parse_game.redx <- Team_Mechanics.arm_rambo parse_game.redx 
-    (Collision_Mechanics.power_count parse_game.pl 
-      (Team_Mechanics.find_rambo parse_game.redx));
+  parse_game.redx <- TM.arm_rambo parse_game.redx 
+    (CM.power_count parse_game.pl 
+      (TM.find_rambo parse_game.redx));
 
   (* Check for blue player - powerup collisions - add power *)
-  parse_game.bluex <- Team_Mechanics.arm_rambo parse_game.bluex 
-    (Collision_Mechanics.power_count parse_game.pl 
-      (Team_Mechanics.find_rambo parse_game.bluex));
+  parse_game.bluex <- TM.arm_rambo parse_game.bluex 
+    (CM.power_count parse_game.pl 
+      (TM.find_rambo parse_game.bluex));
 
   (* Remove powerups from field that collide with player *)
-  parse_game.pl <- Collision_Mechanics.unhit_powers parse_game.pl 
-    (Team_Mechanics.find_rambo parse_game.redx);
+  parse_game.pl <- CM.unhit_powers parse_game.pl 
+    (TM.find_rambo parse_game.redx);
 
-  parse_game.pl <- Collision_Mechanics.unhit_powers parse_game.pl 
-    (Team_Mechanics.find_rambo parse_game.bluex);
+  parse_game.pl <- CM.unhit_powers parse_game.pl 
+    (TM.find_rambo parse_game.bluex);
 
   (* Increase time counter *)
   parse_game.time_el <- parse_game.time_el + 1;
 
   (* Check for endgame conditions - Return game * result *)
   let game_status = 
-    Team_Mechanics.check_endgame parse_game.redx parse_game.bluex in
+    TM.check_endgame parse_game.redx parse_game.bluex in
   (parse_game,game_status)
 
 (* Handles commands from the AIs - immediately update game state *)
@@ -173,23 +178,23 @@ let handle_action gamma col act = match act with
     if col = Red then
       (* If Red has enough charge, get bullet list, add bullets to game,
        * subtract cost *)
-      if Team_Mechanics.get_charge gamma.redx >= cost_of_bullet b 
+      if TM.get_charge gamma.redx >= cost_of_bullet b 
       then
-        let location = Team_Mechanics.locate_rambo gamma.redx in
-        let r = Weapon_Mechanics.deploy col act location in
+        let location = TM.locate_rambo gamma.redx in
+        let r = WM.deploy col act location in
         let n = gamma in
-        n.redx <- Team_Mechanics.rem_charge n.redx (cost_of_bullet b);
+        n.redx <- TM.rem_charge n.redx (cost_of_bullet b);
         n.bl <- (List.append r (n.bl)); n
       else gamma
     else 
       (* If Blue has enough charge, get bullet list, add bullets to game,
        * subtract cost *)
-      if Team_Mechanics.get_charge gamma.bluex >= cost_of_bullet b 
+      if TM.get_charge gamma.bluex >= cost_of_bullet b 
       then
-        let location = Team_Mechanics.locate_rambo gamma.bluex in
-        let r = Weapon_Mechanics.deploy col act location in
+        let location = TM.locate_rambo gamma.bluex in
+        let r = WM.deploy col act location in
         let n = gamma in
-        n.bluex <- Team_Mechanics.rem_charge n.bluex (cost_of_bullet b);
+        n.bluex <- TM.rem_charge n.bluex (cost_of_bullet b);
         n.bl <- (List.append r (n.bl)); 
         n
       else gamma
@@ -197,28 +202,28 @@ let handle_action gamma col act = match act with
   | Focus a ->
     if col = Red 
     then
-      let new_red = Team_Mechanics.toggle_focus a gamma.redx in
+      let new_red = TM.toggle_focus a gamma.redx in
       {gamma with redx = new_red}
     else
-      let new_blue = Team_Mechanics.toggle_focus a gamma.bluex in
+      let new_blue = TM.toggle_focus a gamma.bluex in
       {gamma with bluex = new_blue}
   (* Set off a bomb - Kaboom! *)
   | Bomb -> 
     if col = Red then
-      if Team_Mechanics.war_ready gamma.redx 
+      if TM.war_ready gamma.redx 
       then
         let n = gamma in
         n.bl <- []; (* Remove all bullets *)
-        n.redx <- Team_Mechanics.disarm_bomber n.redx; (* Remove bomb *)
+        n.redx <- TM.disarm_bomber n.redx; (* Remove bomb *)
         n.bri <- cBOMB_DURATION; (* Add invincibility *)
         n   
       else gamma
     else
-      if Team_Mechanics.war_ready gamma.bluex 
+      if TM.war_ready gamma.bluex 
       then 
         let n = gamma in
         n.bl <- []; (* Remove all bullets *)
-        n.bluex <- Team_Mechanics.disarm_bomber n.bluex; (* Remove bomb *)
+        n.bluex <- TM.disarm_bomber n.bluex; (* Remove bomb *)
         n.bbi <- cBOMB_DURATION; (* Add invincibility *)
         n 
       else gamma
