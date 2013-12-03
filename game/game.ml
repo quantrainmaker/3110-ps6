@@ -110,6 +110,25 @@ let handle_time game =
   (* Update ufo hitcounts from bullet collisions*) 
   parse_game.ufox <- CM.ufo_test parse_game.ufox parse_game.bl;
 
+  (* If player comes within graze radius of bullet without being hit,
+   * and the bullet is not the team's color, add points. *)
+  parse_game.redx <- TM.point_count parse_game.redx 
+    (CM.graze_points parse_game.bl (TM.locate_rambo parse_game.redx) Red);
+
+  parse_game.bluex <- TM.point_count parse_game.bluex 
+    (CM.graze_points parse_game.bl (TM.locate_rambo parse_game.bluex) Blue);
+
+  (* If player has bomb invincibility, any bullets they graze are removed *)
+  parse_game.bl <- 
+    if parse_game.bri > 0 then 
+    CM.invin_bullets parse_game.bl (TM.locate_rambo parse_game.redx) Red
+    else parse_game.bl;
+
+  parse_game.bl <- 
+    if parse_game.bbi > 0 then
+    CM.invin_bullets parse_game.bl (TM.locate_rambo parse_game.bluex) Blue  
+    else parse_game.bl;
+
   (* Remove bullets that hit ufos *)
   parse_game.bl <- CM.unhit_bullets parse_game.ufox parse_game.bl;
 

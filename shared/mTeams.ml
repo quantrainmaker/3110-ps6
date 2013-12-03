@@ -78,6 +78,8 @@ module type Team_Data = sig
   val protection : int -> int -> bool
   (* Adds power to the team *)
   val arm_rambo : team_data -> int -> team_data
+  (* Add specified number of points to the team *)
+  val point_count : team_data -> int -> team_data
 end
 
 (* Team functions *)
@@ -132,4 +134,6 @@ module Team_Mechanics : Team_Data = struct
   let protection x y = x > 0 || y > 0
   let arm_rambo x y = match x with
     | (l,q,s,p,c,pl) -> (l,q,s,(p+y),c,pl)
+  let point_count t i = match t with
+    | (l,q,s,p,c,pl) -> (l,q,(s+i),p,c,pl)
 end

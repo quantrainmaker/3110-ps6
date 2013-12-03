@@ -50,6 +50,18 @@ module type Collision = sig
 
   (* Return the list of ufos not destroyed *)
   val delete_ufos: (ufo*int) list -> (ufo*int) list
+
+  (* Returns whether player grazes bullet of opposite color *)
+  val graze_check : bullet -> vector -> color -> bool
+
+  (* Returns number of bullets the player has grazed *)
+  val graze_count : bullet list -> vector -> color -> int
+
+  (* Returns number of points to award player for grazing *)
+  val graze_points : bullet list -> vector -> color -> int
+
+  (* Remove all bullets player grazes *)
+  val invin_bullets : bullet list -> vector -> color -> bullet list
 end
 
 module Collision_Mechanics : Collision = struct
@@ -140,4 +152,23 @@ module Collision_Mechanics : Collision = struct
     List.fold_left scatter p u
 
     let delete_ufos u = List.filter (fun atup -> not (checkhp (fst atup))) u
+
+    let graze_check bull pos col =
+      (distance pos bull.b_pos <= 
+          float_of_int (cGRAZE_RADIUS)) && 
+          (distance pos bull.b_pos > 
+            float_of_int (cHITBOX_RADIUS + bull.b_radius)) &&
+          (not (col = bull.b_color))
+
+    let graze_count b_list pos color =
+      List.fold_left (fun acc x -> 
+        if graze_check x pos color then
+          (acc+1) else acc) 0 b_list
+
+    let graze_points b_list pos color =
+      (graze_count b_list pos color) * cGRAZE_POINTS
+
+    let invin_bullets b_list pos color =
+      List.fold_left (fun acc x -> 
+        if graze_check x pos color then acc else x::acc) [] b_list
 end
