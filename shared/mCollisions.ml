@@ -79,7 +79,8 @@ module Collision_Mechanics : Collision = struct
   
   let ufo_bullets_update u bl =
     List.fold_left (fun acc x -> 
-      if ufo_bullet_test acc x then
+      if ufo_bullet_test acc x && acc.u_red_hits + acc.u_blue_hits < cUFO_HITS 
+      then
         if x.b_color = Red then
           {acc with u_red_hits = (acc.u_red_hits+1)}
         else {acc with u_blue_hits = (acc.u_blue_hits+1)}
