@@ -15,8 +15,7 @@ module UM = UFO_Mechanics
  * Includes Red/blue teams, Ufos, Bullets, Powerups, Time Elapsed,
  * Pending Red Moves and Pending blue Moves. Store Ufos as tuple
  * to include creation time to track when to change direction.
- * Invincibilities stored separately for each team to track times. 
- * Also store bool to track if player was hit *)
+ * Invincibilities stored separately for each team to track times *)
 type game = {
   mutable redx : team_data;
   mutable bluex : team_data; 
@@ -54,8 +53,7 @@ let handle_time game =
   let parse_game = game in
 
   (* Update current ufo positions (and velocities if needed) *)
-  parse_game.ufox <- 
-    UM.batch_ufo parse_game.ufox parse_game.time_el;
+  parse_game.ufox <- UM.batch_ufo parse_game.ufox parse_game.time_el;
 
   (* Spawn a new UFO if needed *)
   parse_game.ufox <- 
@@ -72,22 +70,16 @@ let handle_time game =
   parse_game.pl <- WM.batch_powerups parse_game.pl;
 
   (* Update player positions and player move lists*)
-  parse_game.redx <- 
-    TM.recruit_rambo parse_game.redx parse_game.rm;
+  parse_game.redx <- TM.recruit_rambo parse_game.redx parse_game.rm;
   parse_game.rm <- TM.alter_orders parse_game.rm;
-  parse_game.bluex <- 
-    TM.recruit_rambo parse_game.bluex parse_game.bm;
+  parse_game.bluex <- TM.recruit_rambo parse_game.bluex parse_game.bm;
   parse_game.bm <- TM.alter_orders parse_game.bm;
 
   (* Decrement invincibilities by one if greater than zero *)
-  parse_game.mri <- 
-    CM.weaken_shield parse_game.mri;
-  parse_game.mbi <- 
-    CM.weaken_shield parse_game.mbi;
-  parse_game.bri <-
-    CM.weaken_shield parse_game.bri;
-  parse_game.bbi <-
-    CM.weaken_shield parse_game.bbi;
+  parse_game.mri <- CM.weaken_shield parse_game.mri;
+  parse_game.mbi <- CM.weaken_shield parse_game.mbi;
+  parse_game.bri <- CM.weaken_shield parse_game.bri;
+  parse_game.bbi <- CM.weaken_shield parse_game.bbi;
 
   (* Check for red team hit by a bullet *)
   parse_game.redx <-
@@ -116,18 +108,17 @@ let handle_time game =
     else parse_game.bluex;
 
   (* Update ufo hitcounts from bullet collisions*) 
-  parse_game.ufox <- CM.ufo_test
-    parse_game.ufox parse_game.bl;
+  parse_game.ufox <- CM.ufo_test parse_game.ufox parse_game.bl;
 
   (* Remove bullets that hit ufos *)
-  parse_game.bl <- CM.unhit_bullets 
-    parse_game.ufox parse_game.bl;
+  parse_game.bl <- CM.unhit_bullets parse_game.ufox parse_game.bl;
 
   (* Scatter powerups for all destroyed ufos *)
-  (* TODO *)
+  parse_game.pl <- CM.scatter_powers parse_game.ufox parse_game.bl
+    (TM.find_rambo parse_game.redx) (TM.find_rambo parse_game.bluex);
 
   (* Delete ufos that have been destroyed *)
-  (* TODO *)
+  parse_game.ufox <- CM.delete_ufos parse_game.ufox;
   
   (* If player - bullet collision with no invincibility, 
    * remove all bullets from the game *)
