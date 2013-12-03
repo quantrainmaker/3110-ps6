@@ -145,7 +145,6 @@ let handle_time game =
   (* Remove powerups from field that collide with player *)
   parse_game.pl <- CM.unhit_powers parse_game.pl 
     (TM.find_rambo parse_game.redx);
-
   parse_game.pl <- CM.unhit_powers parse_game.pl 
     (TM.find_rambo parse_game.bluex);
 

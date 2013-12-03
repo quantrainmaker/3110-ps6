@@ -107,7 +107,7 @@ module Collision_Mechanics : Collision = struct
     let makepos rad pos =
       let newrad = Random.float(float_of_int rad) in
       let vec = rotate (scale newrad (unit_v pos)) (Random.float(2. *. pi)) in
-      subt_v pos vec in
+      add_v pos vec in
     (* create a new powerup *)
     let createpow upos ppos col = {
       b_type = Power;
