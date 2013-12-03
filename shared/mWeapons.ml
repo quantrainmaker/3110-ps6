@@ -15,8 +15,6 @@ module type Weapons = sig
   (* Create list of bullets of Trail type *)
   val trail : vector -> vector -> color -> 
     int -> bullet list -> position -> bullet list
-  (* Check to see if a point is outside of field *)
-  val is_impassable : vector -> bool
   (* Move Bullet - Update pos. and accel. Dodge this Neo! 
    * If still in field, then Some bullet else return None *)
   val metal_move : bullet -> bullet option
@@ -90,15 +88,10 @@ module Weapon_Mechanics : Weapons = struct
         else trail y z col 0 [] pos
       | Power -> [] (* Unavailable bullet type *) end
     | _ -> failwith "Invalid weapons command. Report to your superior!"
-  let is_impassable x = 
-    let x_val = fst x in 
-    let y_val = snd x in
-    x_val >= 0.0 && x_val <= float_of_int (cBOARD_WIDTH) && 
-    y_val >= 0.0 && y_val <= float_of_int (cBOARD_HEIGHT)
   let metal_move x = 
     let new_pos = add_v x.b_pos x.b_vel in
     let new_vel = add_v x.b_vel x.b_accel in
-    if is_impassable new_pos then None
+    if (not (in_bounds new_pos)) then None
     else 
       Some {b_type = x.b_type; b_id = x.b_id; b_pos = new_pos;
         b_vel = new_vel; b_accel = x.b_accel; b_radius = x.b_radius;
