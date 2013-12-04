@@ -47,10 +47,27 @@ module type Collision = sig
 end
 
 module Collision_Mechanics : Collision = struct
+  (**************** Helper Functions (hidden by interface) *******************)
   (* Test for player - bullet collision, handles color test *)
   let kevlar_test p b = (p.p_color <> b.b_color) &&
     (distance p.p_pos b.b_pos <= float_of_int (p.p_radius + b.b_radius))
+  (* Returns whether player grazes bullet of opposite color *)
+  let graze_check bull pos col =
+    let dist = distance pos bull.b_pos in
+    (dist <= float_of_int (cGRAZE_RADIUS)) && 
+    (dist > float_of_int (cHITBOX_RADIUS + bull.b_radius)) &&
+    (col <> bull.b_color)
+  (* Returns number of bullets the player has grazed *) 
+  let graze_count b_list pos color =
+    List.fold_left (fun acc bul -> 
+      if graze_check bul pos color 
+      then 
+        let _ = add_update Graze in
+        acc+1 
+      else acc) 0 b_list
   
+
+  (****************** Implemented Module Functions **********************)
   let ufo_bullet_test u b = distance u.u_pos b.b_pos <= 
     float_of_int (u.u_radius + b.b_radius)
   
@@ -100,22 +117,6 @@ module Collision_Mechanics : Collision = struct
         let _ = add_update(DeleteBullet (bul.b_id)) in
         acc 
       else (bul::acc)) [] b
-
-  (* Returns whether player grazes bullet of opposite color *)
-  let graze_check bull pos col =
-    let dist = distance pos bull.b_pos in
-    (dist <= float_of_int (cGRAZE_RADIUS)) && 
-    (dist > float_of_int (cHITBOX_RADIUS + bull.b_radius)) &&
-    (col <> bull.b_color)
-
-  (* Returns number of bullets the player has grazed *) 
-  let graze_count b_list pos color =
-    List.fold_left (fun acc bul -> 
-      if graze_check bul pos color 
-      then 
-        let _ = add_update Graze in
-        acc+1 
-      else acc) 0 b_list
 
   let graze_points b_list pos color =
     (graze_count b_list pos color) * cGRAZE_POINTS

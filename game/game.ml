@@ -54,6 +54,9 @@ let handle_time game =
   (* Continually edit parse_game for the current time_step *)
   let parse_game = game in
 
+
+
+  (************* Update UFO/Bullet Positions, Charge, Invincibility **********)
   (* Update current ufo positions (and velocities if needed) *)
   parse_game.ufox <- UM.batch_ufo parse_game.ufox parse_game.time_el;
 
@@ -76,8 +79,8 @@ let handle_time game =
 
   (* Update player positions and player move lists*)
   parse_game.redx <- TM.recruit_rambo parse_game.redx parse_game.rm;
-  parse_game.rm <- TM.alter_orders parse_game.rm;
   parse_game.bluex <- TM.recruit_rambo parse_game.bluex parse_game.bm;
+  parse_game.rm <- TM.alter_orders parse_game.rm;
   parse_game.bm <- TM.alter_orders parse_game.bm;
 
   (* Decrement invincibilities by one if greater than zero *)
@@ -85,6 +88,12 @@ let handle_time game =
   parse_game.mbi <- CM.weaken_shield parse_game.mbi;
   parse_game.bri <- CM.weaken_shield parse_game.bri;
   parse_game.bbi <- CM.weaken_shield parse_game.bbi;
+
+
+ 
+  (************ Bullet/UFO and Bullet/Player Collisions *****************)
+  (* Update ufo hitcounts from bullet collisions*) 
+  parse_game.ufox <- CM.ufo_test parse_game.ufox parse_game.bl;
 
   (* Check for teams hit by a bullet *)
   parse_game.redx <-
@@ -107,9 +116,6 @@ let handle_time game =
         parse_game.redx <- TM.award_medal parse_game.redx;
         parse_game.bluex) ()
     else parse_game.bluex;
-
-  (* Update ufo hitcounts from bullet collisions*) 
-  parse_game.ufox <- CM.ufo_test parse_game.ufox parse_game.bl;
 
   (* If player comes within graze radius of bullet without being hit,
    * and the bullet is not the team's color, add points. *)
@@ -141,14 +147,17 @@ let handle_time game =
   (* If player - bullet collision with no invincibility, 
    * remove all bullets from the game *)
   parse_game.bl <- 
-    if (CM.valid_hit parse_game.bl (TM.find_rambo parse_game.redx) &&
-      not (TM.protection parse_game.mri parse_game.bri)) || 
-      (CM.valid_hit parse_game.bl  (TM.find_rambo parse_game.bluex) && 
-      not (TM.protection parse_game.mbi parse_game.bbi)) 
+    if ((CM.valid_hit parse_game.bl (TM.find_rambo parse_game.redx) &&
+      not (TM.protection parse_game.mri parse_game.bri))) || 
+      ((CM.valid_hit parse_game.bl  (TM.find_rambo parse_game.bluex) && 
+      not (TM.protection parse_game.mbi parse_game.bbi)))
     then 
       WM.remove_bullets parse_game.bl
     else parse_game.bl; 
     
+
+
+  (******************* Player/Powerup Collisions **************************)  
   (* Check for player - powerup collisions - add power *)
   parse_game.redx <- TM.arm_rambo parse_game.redx 
     (CM.power_count parse_game.pl (TM.find_rambo parse_game.redx));
@@ -161,6 +170,9 @@ let handle_time game =
   parse_game.pl <- CM.unhit_powers parse_game.pl 
     (TM.find_rambo parse_game.bluex);
 
+
+
+  (******************** Check Endgame Conditions **************************)
   (* Increase time counter *)
   parse_game.time_el <- parse_game.time_el + 1;
 

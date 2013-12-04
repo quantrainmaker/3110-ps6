@@ -16,6 +16,7 @@ module type Weapons = sig
 end
 
 module Weapon_Mechanics : Weapons = struct
+  (**************** Helper Functions (hidden by interface) *******************)
   (* create a new bullet given type,position,velocity,acceleration,and color *)
   let createbul typ pos vel acc col =
     let valid_acc = if magnitude acc > cACCEL_LIMIT then (0., 0.) else acc in
@@ -64,6 +65,22 @@ module Weapon_Mechanics : Weapons = struct
         acc col in
       trail targ acc col (tracker + 1) 
         (b_straight::b_left::b_right::storage) position
+  (* Move Bullet - Update pos. and accel. Dodge this Neo! 
+   * If still in field, then Some bullet else return None *)
+  let move_bullet bul = 
+    let new_pos = add_v bul.b_pos bul.b_vel in
+    let new_vel = add_v bul.b_vel bul.b_accel in
+    if (not (in_bounds new_pos)) 
+    then 
+      let _ = add_update(DeleteBullet (bul.b_id)) in
+      None
+    else
+      let newbul = {bul with b_pos = new_pos} in
+      let _ = add_update(MoveBullet(bul.b_id, new_pos)) in
+      Some {newbul with b_vel = new_vel}
+
+
+  (****************** Implemented Module Functions **********************)
   let deploy col arg pos = match arg with
     | Shoot (typ,bpos,accel) -> begin match typ with
       | Spread -> 
@@ -81,19 +98,6 @@ module Weapon_Mechanics : Weapons = struct
         else trail bpos accel col 0 [] pos
       | Power -> [] (* Unavailable bullet type *) end
     | _ -> failwith "Invalid weapons command. Report to your superior!"
-  (* Move Bullet - Update pos. and accel. Dodge this Neo! 
-   * If still in field, then Some bullet else return None *)
-  let move_bullet bul = 
-    let new_pos = add_v bul.b_pos bul.b_vel in
-    let new_vel = add_v bul.b_vel bul.b_accel in
-    if (not (in_bounds new_pos)) 
-    then 
-      let _ = add_update(DeleteBullet (bul.b_id)) in
-      None
-    else
-      let newbul = {bul with b_pos = new_pos} in
-      let _ = add_update(MoveBullet(bul.b_id, new_pos)) in
-      Some {newbul with b_vel = new_vel}
   let batch_bullets blist =
     List.fold_left (fun acc bul ->
       match move_bullet bul with
