@@ -92,9 +92,8 @@ module Weapon_Mechanics : Weapons = struct
       None
     else
       let newbul = {bul with b_pos = new_pos} in
-      add_update(MoveBullet(newbul.b_id, newbul.b_pos));
-      if bul.b_type = Power then Some newbul
-      else Some {newbul with b_vel = new_vel}
+      let _ = add_update(MoveBullet(newbul.b_id, newbul.b_pos)) in
+      Some {newbul with b_vel = new_vel}
   let batch_bullets blist =
     List.fold_left (fun acc bul ->
       match move_bullet bul with

@@ -103,19 +103,19 @@ module Collision_Mechanics : Collision = struct
 
   (* Returns whether player grazes bullet of opposite color *)
   let graze_check bull pos col =
-    (distance pos bull.b_pos <= float_of_int (cGRAZE_RADIUS)) && 
-    (distance pos bull.b_pos > 
-      float_of_int (cHITBOX_RADIUS + bull.b_radius)) &&
+    let dist = distance pos bull.b_pos in
+    (dist <= float_of_int (cGRAZE_RADIUS)) && 
+    (dist > float_of_int (cHITBOX_RADIUS + bull.b_radius)) &&
     (not (col = bull.b_color))
 
   (* Returns number of bullets the player has grazed *) 
   let graze_count b_list pos color =
-  List.fold_left (fun acc bul -> 
-    if graze_check bul pos color 
-    then 
-      let _ = add_update Graze in
-      acc+1 
-    else acc) 0 b_list
+    List.fold_left (fun acc bul -> 
+      if graze_check bul pos color 
+      then 
+        let _ = add_update Graze in
+        acc+1 
+      else acc) 0 b_list
 
   let graze_points b_list pos color =
     (graze_count b_list pos color) * cGRAZE_POINTS
