@@ -48,7 +48,7 @@ end
 
 module Collision_Mechanics : Collision = struct
   (* Test for player - bullet collision, handles color test *)
-  let kevlar_test p b = (p.p_color != b.b_color) &&
+  let kevlar_test p b = (p.p_color <> b.b_color) &&
     (distance p.p_pos b.b_pos <= float_of_int (p.p_radius + b.b_radius))
   
   let ufo_bullet_test u b = distance u.u_pos b.b_pos <= 
@@ -106,7 +106,7 @@ module Collision_Mechanics : Collision = struct
     let dist = distance pos bull.b_pos in
     (dist <= float_of_int (cGRAZE_RADIUS)) && 
     (dist > float_of_int (cHITBOX_RADIUS + bull.b_radius)) &&
-    (not (col = bull.b_color))
+    (col <> bull.b_color)
 
   (* Returns number of bullets the player has grazed *) 
   let graze_count b_list pos color =

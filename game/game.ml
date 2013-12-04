@@ -132,7 +132,7 @@ let handle_time game =
   parse_game.bl <- CM.unhit_bullets parse_game.ufox parse_game.bl;
 
   (* Scatter powerups for all destroyed ufos *)
-  parse_game.pl <- UM.scatter_powers parse_game.ufox parse_game.bl
+  parse_game.pl <- UM.scatter_powers parse_game.ufox parse_game.pl
     (TM.find_rambo parse_game.redx) (TM.find_rambo parse_game.bluex);
 
   (* Delete ufos that have been destroyed *)
@@ -166,7 +166,7 @@ let handle_time game =
 
   (* Check for endgame conditions *)
   let game_status = TM.check_endgame parse_game.redx parse_game.bluex in
-  if not (game_status = Unfinished) then add_update(GameOver(game_status));
+  if (game_status <> Unfinished) then add_update(GameOver(game_status));
 
   (* Return game * result *)
   (parse_game, game_status)

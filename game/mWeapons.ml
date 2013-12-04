@@ -92,7 +92,7 @@ module Weapon_Mechanics : Weapons = struct
       None
     else
       let newbul = {bul with b_pos = new_pos} in
-      let _ = add_update(MoveBullet(newbul.b_id, newbul.b_pos)) in
+      let _ = add_update(MoveBullet(bul.b_id, new_pos)) in
       Some {newbul with b_vel = new_vel}
   let batch_bullets blist =
     List.fold_left (fun acc bul ->
@@ -100,7 +100,7 @@ module Weapon_Mechanics : Weapons = struct
       | Some abul -> abul::acc
       | None -> acc) [] blist
   let remove_bullets blist =
-    let _ = List.rev_map (fun bul -> 
-      add_update(DeleteBullet (bul.b_id))) blist in
+    List.iter (fun bul -> 
+      add_update(DeleteBullet (bul.b_id))) blist;
     [] 
 end
