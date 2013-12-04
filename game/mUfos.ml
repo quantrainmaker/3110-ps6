@@ -88,15 +88,17 @@ module UFO_Mechanics : UFO = struct
       add_v pos vec in
     (* create a new powerup *)
     let createpow upos ppos col = 
-      let pow = {
-        b_type = Power;
-        b_id = next_available_id ();
-        b_pos = makepos cUFO_SCATTER_RADIUS upos;
-        b_vel = scale (float_of_int cPOWER_SPEED) (unit_v (subt_v ppos upos));
-        b_accel = (0., 0.);
-        b_radius = cPOWER_RADIUS;
-        b_color = col
-      } in
+      let pow = 
+        let newpos = makepos cUFO_SCATTER_RADIUS upos in
+        {
+          b_type = Power;
+          b_id = next_available_id ();
+          b_pos = newpos;
+          b_vel = scale (float_of_int cPOWER_SPEED) (unit_v (subt_v ppos newpos));
+          b_accel = (0., 0.);
+          b_radius = cPOWER_RADIUS;
+          b_color = col
+        } in
       add_update (AddBullet (pow.b_id, pow.b_color, pow.b_type, pow.b_pos));
       pow in
     (* create total powerups of a certain color *)
