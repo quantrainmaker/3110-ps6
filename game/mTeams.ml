@@ -115,8 +115,13 @@ module Team_Mechanics : Team_Data = struct
     (l,q,s,p,newc,pl)
   let add_charge (l,q,s,p,c,pl) = 
     let newc = c + p + cCHARGE_RATE in
-    let _ = add_update(SetCharge(pl.p_color, newc)) in
-    (l,q,s,p,newc,pl)
+    if newc > cCHARGE_MAX 
+    then
+      let _ = add_update(SetCharge(pl.p_color, cCHARGE_MAX)) in
+      (l,q,s,p,cCHARGE_MAX,pl)
+    else
+      let _ = add_update(SetCharge(pl.p_color, newc)) in
+      (l,q,s,p,newc,pl)
   let locate_rambo (l,q,s,p,c,pl) = pl.p_pos
   let war_ready (l,q,s,p,c,pl) = q > 0
   let disarm_bomber (l,q,s,p,c,pl) = 
