@@ -85,10 +85,10 @@ let handle_time game =
   parse_game.bm <- TM.alter_orders parse_game.bm;
 
   (* Decrement invincibilities by one if greater than zero *)
-  parse_game.mri <- CM.weaken_shield parse_game.mri;
-  parse_game.mbi <- CM.weaken_shield parse_game.mbi;
-  parse_game.bri <- CM.weaken_shield parse_game.bri;
-  parse_game.bbi <- CM.weaken_shield parse_game.bbi;
+  parse_game.mri <- TM.weaken_shield parse_game.mri;
+  parse_game.mbi <- TM.weaken_shield parse_game.mbi;
+  parse_game.bri <- TM.weaken_shield parse_game.bri;
+  parse_game.bbi <- TM.weaken_shield parse_game.bbi;
 
 
  

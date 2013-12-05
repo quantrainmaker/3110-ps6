@@ -94,6 +94,8 @@ module type Team_Data = sig
   val reset_bullet_hit : team_data -> team_data
   (* Takes two ints - determines if invincible or not *)
   val protection : int -> int -> bool
+  (* Decrease a value by one to a minimum of zero *)
+  val weaken_shield : int -> int
   (* Adds power to the team *)
   val arm_rambo : team_data -> int -> team_data
 end
@@ -163,6 +165,7 @@ module Team_Mechanics : Team_Data = struct
     add_update(SetPower(pl.p_color, newp));
     (newl,newq,s,newp,c,pl)
   let protection x y = x > 0 || y > 0
+  let weaken_shield anint = if anint > 0 then (anint-1) else anint
   let arm_rambo (l,q,s,p,c,pl) anint = 
     let newp = p + anint in
     let _ = add_update(SetPower(pl.p_color, newp)) in

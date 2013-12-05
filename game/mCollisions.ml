@@ -11,9 +11,6 @@ module type Collision = sig
   (* Test for ufo - bullet/powerup collisions *)
   val ufo_bullet_test : ufo -> bullet -> bool
   
-  (* Decrease a value by one to a minimum of zero *)
-  val weaken_shield : int -> int
-  
   (* Returns whether player hit by bullet in list *)
   val valid_hit : bullet list -> player_char -> bool
   
@@ -70,8 +67,6 @@ module Collision_Mechanics : Collision = struct
   (****************** Implemented Module Functions **********************)
   let ufo_bullet_test u b = distance u.u_pos b.b_pos <= 
     float_of_int (u.u_radius + b.b_radius)
-  
-  let weaken_shield anint = if anint > 0 then (anint-1) else anint
   
   let valid_hit bl pc = 
     List.fold_left (fun acc bul -> 
