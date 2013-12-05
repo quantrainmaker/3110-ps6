@@ -17,7 +17,8 @@ module UM = UFO_Mechanics
  * Includes Red/blue teams, Ufos, Bullets, Powerups, Time Elapsed,
  * Pending Red Moves and Pending blue Moves. Store Ufos as tuple
  * to include creation time to track when to change direction.
- * Invincibilities stored separately for each team to track times *)
+ * Invincibilities (mercy and bomb) stored separately for each team 
+ * to track times *)
 type game = {
   mutable redx : team_data;
   mutable bluex : team_data; 
@@ -95,27 +96,12 @@ let handle_time game =
   (* Update ufo hitcounts from bullet collisions*) 
   parse_game.ufox <- CM.ufo_test parse_game.ufox parse_game.bl;
 
-  (* Check for teams hit by a bullet *)
-  parse_game.redx <-
-    if TM.protection parse_game.mri parse_game.bri 
-    then parse_game.redx
-    else if CM.valid_hit parse_game.bl (TM.find_rambo parse_game.redx) 
-      then (fun () -> 
-      	parse_game.mri <- cINVINCIBLE_FRAMES;
-        parse_game.redx <- TM.reset_bullet_hit parse_game.redx;
-        parse_game.bluex <- TM.award_medal parse_game.bluex;
-        parse_game.redx) ()
-    else parse_game.redx;
-  parse_game.bluex <-
-    if TM.protection parse_game.mbi parse_game.bbi  
-    then parse_game.bluex
-    else if CM.valid_hit parse_game.bl (TM.find_rambo parse_game.bluex) 
-      then (fun () -> 
-      	parse_game.mbi <- cINVINCIBLE_FRAMES;
-        parse_game.bluex <- TM.reset_bullet_hit parse_game.bluex;
-        parse_game.redx <- TM.award_medal parse_game.redx;
-        parse_game.bluex) ()
-    else parse_game.bluex;
+  (* Scatter powerups for all destroyed ufos *)
+  parse_game.pl <- UM.scatter_powers parse_game.ufox parse_game.pl
+    (TM.find_rambo parse_game.redx) (TM.find_rambo parse_game.bluex);
+
+  (* Delete ufos that have been destroyed *)
+  parse_game.ufox <- UM.delete_ufos parse_game.ufox;
 
   (* If player comes within graze radius of bullet without being hit,
    * and the bullet is not the team's color, add points. *)
@@ -123,6 +109,24 @@ let handle_time game =
     (CM.graze_points parse_game.bl (TM.locate_rambo parse_game.redx) Red);
   parse_game.bluex <- TM.point_count parse_game.bluex 
     (CM.graze_points parse_game.bl (TM.locate_rambo parse_game.bluex) Blue);
+
+  (* Check for teams hit by a bullet - change lives, power, and score *)
+  parse_game.redx <-
+    if TM.protection parse_game.mri parse_game.bri 
+    then parse_game.redx
+    else if CM.valid_hit parse_game.bl (TM.find_rambo parse_game.redx) 
+      then
+        let _ = parse_game.bluex <- TM.award_medal parse_game.bluex in
+        TM.reset_bullet_hit parse_game.redx
+    else parse_game.redx;
+  parse_game.bluex <-
+    if TM.protection parse_game.mbi parse_game.bbi  
+    then parse_game.bluex
+    else if CM.valid_hit parse_game.bl (TM.find_rambo parse_game.bluex) 
+      then 
+        let _ = parse_game.redx <- TM.award_medal parse_game.redx in
+        TM.reset_bullet_hit parse_game.bluex
+    else parse_game.bluex;
 
   (* If player has bomb invincibility, any bullets they graze are removed *)
   parse_game.bl <- 
@@ -136,24 +140,32 @@ let handle_time game =
 
   (* Remove bullets that hit ufos *)
   parse_game.bl <- CM.unhit_bullets parse_game.ufox parse_game.bl;
-
-  (* Scatter powerups for all destroyed ufos *)
-  parse_game.pl <- UM.scatter_powers parse_game.ufox parse_game.pl
-    (TM.find_rambo parse_game.redx) (TM.find_rambo parse_game.bluex);
-
-  (* Delete ufos that have been destroyed *)
-  parse_game.ufox <- UM.delete_ufos parse_game.ufox;
   
   (* If player - bullet collision with no invincibility, 
-   * remove all bullets from the game *)
-  parse_game.bl <- 
-    if ((CM.valid_hit parse_game.bl (TM.find_rambo parse_game.redx) &&
-      not (TM.protection parse_game.mri parse_game.bri))) || 
-      ((CM.valid_hit parse_game.bl  (TM.find_rambo parse_game.bluex) && 
-      not (TM.protection parse_game.mbi parse_game.bbi)))
-    then 
+   * remove all bullets from the game and update invincibilities *)
+  (parse_game.bl <- 
+    let isredhit = 
+      ((CM.valid_hit parse_game.bl (TM.find_rambo parse_game.redx) &&
+      (not (TM.protection parse_game.mri parse_game.bri)))) in
+    let isbluehit =
+      ((CM.valid_hit parse_game.bl (TM.find_rambo parse_game.bluex) && 
+      (not (TM.protection parse_game.mbi parse_game.bbi)))) in
+    if isbluehit && isredhit
+    then
+      let _ = parse_game.mbi <- cINVINCIBLE_FRAMES in
+      let _ = parse_game.mri <- cINVINCIBLE_FRAMES in
       WM.remove_bullets parse_game.bl
-    else parse_game.bl; 
+    else 
+      if isbluehit
+      then
+        let _ = parse_game.mbi <- cINVINCIBLE_FRAMES in
+        WM.remove_bullets parse_game.bl
+      else 
+        if isredhit
+        then
+          let _ = parse_game.mri <- cINVINCIBLE_FRAMES in
+          WM.remove_bullets parse_game.bl
+        else parse_game.bl);
     
 
 
@@ -178,7 +190,7 @@ let handle_time game =
 
   (* Check for endgame conditions *)
   let game_status = TM.check_endgame parse_game.redx parse_game.bluex in
-  if (game_status <> Unfinished) then add_update(GameOver(game_status));
+  (if (game_status <> Unfinished) then add_update(GameOver(game_status)));
 
   (* Return game * result *)
   (parse_game, game_status)
@@ -201,10 +213,10 @@ let handle_action agame col act = match act with
       then
         let location = TM.locate_rambo agame.redx in
         let buls = WM.deploy col act location in
-        let n = agame in
-        n.redx <- TM.rem_charge n.redx acost;
-        n.bl <- buls @ n.bl; 
-        n
+        let g = agame in
+        g.redx <- TM.rem_charge g.redx acost;
+        g.bl <- buls @ g.bl; 
+        g
       else agame
     else 
       (* If Blue has enough charge, get bullet list, add bullets to game,
@@ -214,10 +226,10 @@ let handle_action agame col act = match act with
       then
         let location = TM.locate_rambo agame.bluex in
         let buls = WM.deploy col act location in
-        let n = agame in
-        n.bluex <- TM.rem_charge n.bluex acost;
-        n.bl <- buls @ n.bl; 
-        n
+        let g = agame in
+        g.bluex <- TM.rem_charge g.bluex acost;
+        g.bl <- buls @ g.bl; 
+        g
       else agame
   (* Toggle focused state *)
   | Focus abool ->
