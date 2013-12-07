@@ -6,11 +6,9 @@ game/game.cmx : shared/util.cmx game/netgraphics.cmx game/mWeapons.cmx \
     shared/definitions.cmx shared/constants.cmx game/game.cmi
 game/game.cmi : shared/definitions.cmo shared/constants.cmo
 game/mCollisions.cmo : shared/util.cmo game/netgraphics.cmi \
-    game/mWeapons.cmo game/mUfos.cmo game/mTeams.cmo shared/definitions.cmo \
-    shared/constants.cmo
+    shared/definitions.cmo shared/constants.cmo
 game/mCollisions.cmx : shared/util.cmx game/netgraphics.cmx \
-    game/mWeapons.cmx game/mUfos.cmx game/mTeams.cmx shared/definitions.cmx \
-    shared/constants.cmx
+    shared/definitions.cmx shared/constants.cmx
 game/mTeams.cmo : shared/util.cmo game/netgraphics.cmi \
     shared/definitions.cmo shared/constants.cmo
 game/mTeams.cmx : shared/util.cmx game/netgraphics.cmx \
@@ -19,9 +17,9 @@ game/mUfos.cmo : shared/util.cmo game/netgraphics.cmi shared/definitions.cmo \
     shared/constants.cmo
 game/mUfos.cmx : shared/util.cmx game/netgraphics.cmx shared/definitions.cmx \
     shared/constants.cmx
-game/mWeapons.cmo : shared/util.cmo game/netgraphics.cmi game/mTeams.cmo \
+game/mWeapons.cmo : shared/util.cmo game/netgraphics.cmi \
     shared/definitions.cmo shared/constants.cmo
-game/mWeapons.cmx : shared/util.cmx game/netgraphics.cmx game/mTeams.cmx \
+game/mWeapons.cmx : shared/util.cmx game/netgraphics.cmx \
     shared/definitions.cmx shared/constants.cmx
 game/netgraphics.cmo : shared/util.cmo shared/definitions.cmo \
     shared/connection.cmi game/netgraphics.cmi

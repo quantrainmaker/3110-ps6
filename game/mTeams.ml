@@ -78,7 +78,7 @@ module type Team_Data = sig
   (* Remove bombs from the team *)
   val disarm_bomber : team_data -> team_data
   (* Determines if game has ended *)
-  val check_endgame : team_data -> team_data -> result
+  val check_endgame : team_data -> team_data -> int -> result
   (* Apply a single move to the team character from the move list *)
   val recruit_rambo : team_data -> (direction * direction) list -> team_data
   (* Remove the first move from a move list if possible *)
@@ -138,7 +138,7 @@ module Team_Mechanics : Team_Data = struct
     let dex = death_check x in
     let dey = death_check y in
     if (dex && dey) || 
-      (totaltime <= atime && (not (dex || dey)) then
+      (totaltime <= (float_of_int atime) && (not (dex || dey))) then
       if s1 > s2 then Winner pl1.p_color
       else if s2 > s1 then Winner pl2.p_color
       else Tie
