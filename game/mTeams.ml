@@ -131,15 +131,19 @@ module Team_Mechanics : Team_Data = struct
     let _ = add_update(SetBombs(pl.p_color, newq)) in
     let _ = add_update(UseBomb(pl.p_color)) in
     (l,newq,s,p,c,pl)
-  let check_endgame (l1,q1,s1,p1,c1,pl1) (l2,q2,s2,p2,c2,pl2) = 
+  let check_endgame (l1,q1,s1,p1,c1,pl1) (l2,q2,s2,p2,c2,pl2) atime = 
     let x = (l1,q1,s1,p1,c1,pl1) in
     let y = (l2,q2,s2,p2,c2,pl2) in
-    if death_check x && death_check y then
+    let totaltime = cTIME_LIMIT /. cUPDATE_TIME in
+    let dex = death_check x in
+    let dey = death_check y in
+    if (dex && dey) || 
+      (totaltime <= atime && (not (dex || dey)) then
       if s1 > s2 then Winner pl1.p_color
       else if s2 > s1 then Winner pl2.p_color
       else Tie
-    else if death_check x then Winner pl2.p_color
-    else if death_check y then Winner pl1.p_color
+    else if dex then Winner pl2.p_color
+    else if dey then Winner pl1.p_color
     else Unfinished
   let recruit_rambo (l,q,s,p,c,pl) = function
     | [] -> (l,q,s,p,c,pl)

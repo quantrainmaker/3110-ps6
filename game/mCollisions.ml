@@ -1,9 +1,6 @@
 open Definitions
 open Constants
 open Util
-open MTeams
-open MUfos
-open MWeapons
 open Netgraphics
 
 (* Module for handling collision & invincibility functionality *)

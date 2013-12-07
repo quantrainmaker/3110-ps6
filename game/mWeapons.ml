@@ -1,7 +1,6 @@
 open Definitions
 open Constants
 open Util
-open MTeams
 open Netgraphics
 
 (* Handle weapon functionality - Bullets *)
@@ -81,7 +80,7 @@ module Weapon_Mechanics : Weapons = struct
 
 
   (****************** Implemented Module Functions **********************)
-  let deploy col arg pos = match arg with
+  let deploy col act pos = match act with
     | Shoot (typ,bpos,accel) -> begin match typ with
       | Spread -> 
         (* Check edge case *)

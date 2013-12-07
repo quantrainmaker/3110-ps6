@@ -189,7 +189,8 @@ let handle_time game =
   parse_game.time_el <- parse_game.time_el + 1;
 
   (* Check for endgame conditions *)
-  let game_status = TM.check_endgame parse_game.redx parse_game.bluex in
+  let game_status = TM.check_endgame parse_game.redx parse_game.bluex 
+    parse_game.time_el in
   (if (game_status <> Unfinished) then add_update(GameOver(game_status)));
 
   (* Return game * result *)
