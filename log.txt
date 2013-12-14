@@ -1,0 +1,198 @@
+commit c2eb8966bb85baa24387ddb00ea6d0db82a80914
+Merge: a892724 2dbcf7e
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Sat Dec 14 16:34:38 2013 -0500
+
+    added bot, named rambo
+
+commit a892724731ceab6f8609f98404c9608ba647ebe3
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Sat Dec 14 16:32:49 2013 -0500
+
+    added bot, named rambo
+
+commit 2dbcf7e877ee1829f65d6b0906434b0f55c15002
+Author: Anton Gilgur <agilgur5@gmail.com>
+Date:   Fri Dec 6 23:53:02 2013 -0500
+
+    final log
+
+commit b32ad4c622911601d06aa9fc37f2bd208f46fec3
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Fri Dec 6 23:47:06 2013 -0500
+
+    compiled and fixed previous update
+
+commit 67f17cc5cc5d97fd83975920954cbfb74b54a3d2
+Author: Anton Gilgur <agilgur5@gmail.com>
+Date:   Fri Dec 6 23:32:38 2013 -0500
+
+    new log
+
+commit aa4801e92c0a09a3c56fb67bafcfbbff18f24a3c
+Author: Anton Gilgur <agilgur5@gmail.com>
+Date:   Fri Dec 6 23:31:56 2013 -0500
+
+    edited design doc, added time limit check, added log
+
+commit 316d69e792f79470f6b63ef5e27b636a5082d00e
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Thu Dec 5 01:12:30 2013 -0500
+
+    updated writeup
+
+commit ce5d0def618e54a4ab86cce91864c105b8333990
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Wed Dec 4 22:47:28 2013 -0500
+
+    moved weaken shield to TeamMechanics, updated .tex file (not pdf though)
+
+commit ddd857afbc67c9d37040fb5b6bcae18bdb6f47c3
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Wed Dec 4 21:30:28 2013 -0500
+
+    Fixed when hit, delete all bullets. All should be working now #sozardoz #muchkarma #verytouhou
+
+commit 84032711caed28fd5f1d49ad815991362131ac10
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Wed Dec 4 18:11:31 2013 -0500
+
+    pretty sure everything works now #zardoz #yolo #touhou #hashtags
+
+commit f16b328ca4fbd0b69ec4a30a87cb635d57f5156d
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Wed Dec 4 16:34:56 2013 -0500
+
+    Fixed power and graphics, possibly other errors remain
+
+commit df2620b6358d04a0b7990b0c13bd6c253e465e85
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Wed Dec 4 00:48:09 2013 -0500
+
+    slight changes. MoveBullet doesn't work but Add does. Power is also being added too much
+
+commit 8897fadd99d8ae16764bf193702bbdd476eb49a4
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Tue Dec 3 22:29:39 2013 -0500
+
+    small fix so charge can't go over max
+
+commit 48a95e0ca2895b961e71b8fb921a5b1b4ad7df9a
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Tue Dec 3 22:13:40 2013 -0500
+
+    minor fix in powerup velocity
+
+commit e7647f3600fc66031fdfcaf42d6f6f39b686013a
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Tue Dec 3 21:37:25 2013 -0500
+
+    added charge, graphics, major style changes and code reusability, and others. minor bugs
+
+commit 794c2b36394b53f8cfb994afd510f75486392ec4
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Tue Dec 3 11:18:06 2013 -0500
+
+    rambos guns
+
+commit 40c5799bd66193a8931c0ebfb1bec6a96128a92e
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Mon Dec 2 22:09:34 2013 -0500
+
+    initial writeup copy
+
+commit 28c49115c071028d8daf52320ced1d55b7322fec
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Mon Dec 2 21:19:20 2013 -0500
+
+    implemented graze
+
+commit c1debefd847705291bb87c1790ba56a83b3884ac
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Mon Dec 2 19:49:00 2013 -0500
+
+    fixed ufo_bullets_update to comply with piazza post
+
+commit 6c81fffadfb3b6ff8afd21974f4812094678fcac
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Mon Dec 2 19:35:08 2013 -0500
+
+    small fix to last commit
+
+commit 33069b3997eb96c0d316d0255a80bd7bc54c770e
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Mon Dec 2 19:26:13 2013 -0500
+
+    scatter + delete ufos done + random style edits
+
+commit 23b4c32a0051e6caf646106de4053712b745f1a2
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Mon Dec 2 16:58:21 2013 -0500
+
+    sdv
+
+commit ea0c9e9ec355b43d2848f4343a73103e6f612807
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Mon Dec 2 16:07:06 2013 -0500
+
+    shortened mechanics names in game to WM/CM/UM/TM for readability
+
+commit 690f198aba90bd522c1299a515db27dd0b6ecb74
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Mon Dec 2 16:00:45 2013 -0500
+
+    style changes and fit to 80 char width everywhere
+
+commit 1b98ec43fe3aceb817e7b006321218ad5d1695d3
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Mon Dec 2 13:01:28 2013 -0500
+
+    minor style changes
+
+commit 63790d25a895ad612061683b930b14f09235fe62
+Author: agilgur5 <agilgur5@gmail.com>
+Date:   Mon Dec 2 13:00:02 2013 -0500
+
+    minor style changes
+
+commit d5f6d86712dfd6f299ac9e56a7b45b0d9feaf6af
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Mon Dec 2 02:24:12 2013 -0500
+
+    worked more
+
+commit 189d6da1848a2d063c4283c5534a3af2ec044057
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Sun Dec 1 18:33:22 2013 -0500
+
+    Worked more on all ml files
+
+commit 19e7c0e49ad4d4690d7afc6a434ad92fd26486c2
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Sun Dec 1 11:57:26 2013 -0500
+
+    More updates - began work on handle_time function in game
+
+commit 8a05ee6648b3b8731f769bb709fc89915750cf65
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Sun Dec 1 00:07:30 2013 -0500
+
+    updated game so make all works
+
+commit c4857367c109a0ac4ae8c3fc4a4a47bd5e2a19d3
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Sat Nov 30 23:56:36 2013 -0500
+
+    Initial work complete
+
+commit def7b76435edb2a118d55e4da44a062d6d53ed28
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Fri Nov 29 14:23:03 2013 -0500
+
+    All files
+
+commit 4707d53daf217b788bacba0d866bbc280f640edd
+Author: quantrainmaker <lab292@cornell.edu>
+Date:   Fri Nov 29 10:12:32 2013 -0800
+
+    Initial commit
