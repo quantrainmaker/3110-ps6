@@ -43,6 +43,10 @@ team/babybot.cmo : shared/util.cmo team/team.cmo shared/definitions.cmo \
     shared/constants.cmo
 team/babybot.cmx : shared/util.cmx team/team.cmx shared/definitions.cmx \
     shared/constants.cmx
+team/rambo.cmo : shared/util.cmo team/team.cmo shared/definitions.cmo \
+    shared/constants.cmo
+team/rambo.cmx : shared/util.cmx team/team.cmx shared/definitions.cmx \
+    shared/constants.cmx
 team/team.cmo : shared/util.cmo shared/definitions.cmo shared/constants.cmo \
     shared/connection.cmi
 team/team.cmx : shared/util.cmx shared/definitions.cmx shared/constants.cmx \

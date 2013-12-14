@@ -5,7 +5,7 @@
 # You may wish to modify these or add new ones
 
 default: all
-all: team/babybot.exe game/game.exe
+all: team/babybot.exe team/rambo.exe game/game.exe
 
 # Note: you should not need to run "make clean" every time you change something.
 # The "make" tool figures out what has changed and what needs to be rebuilt.
@@ -54,6 +54,11 @@ team/babybot.exe:         \
 	shared/shared.cma \
 	team/team.cmo     \
 	team/babybot.cmo
+
+team/rambo.exe:         \
+	shared/shared.cma \
+	team/team.cmo     \
+	team/rambo.cmo
 
 game/game.exe:               \
 	shared/shared.cma    \

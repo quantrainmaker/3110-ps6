@@ -5,7 +5,7 @@
 # You may wish to modify these or add new ones
 
 default: all
-all: team/babybot.exe game/game.exe
+all: team/babybot.exe team/rambo.exe game/game.exe
 
 # Note: you should not need to run "make clean" every time you change something.
 # The "make" tool figures out what has changed and what needs to be rebuilt.
